@@ -4,32 +4,27 @@
   nixpkgs,
   ...
 }:
-let
-  supported-systems = with flake-utils.lib.system; [
-    x86_64-linux
-    aarch64-darwin
-    aarch64-linux
-  ];
-in
-flake-utils.lib.eachSystem supported-systems (
-  system:
-  let
-    pkgs = import nixpkgs { inherit system; };
-  in
-  {
-    packages.pkg-tool = pkgs.buildDotnetModule {
-      name = "PkgTool";
-
-      src = pkgs.fetchFromGitHub {
-        owner = "maxton";
-        repo = "LibOrbisPkg";
-        tag = "v0.2";
-        sha256 = "sha256-FaEcRrJtIvsq9bQ6g5Q4Vj6FeGW4EwPpd8KwMLJaLaw=";
+{
+  packages.x86_64-linux.pkg-tool-core =
+    let
+      pkgs = import nixpkgs { system = "x86_64-linux"; };
+    in
+    pkgs.stdenv.mkDerivation {
+      name = "PkgTool.Core";
+      src = pkgs.fetchurl {
+        url = "https://github.com/maxton/LibOrbisPkg/releases/download/v0.2/PkgTool.Core-linux-x64-0.2.231.zip";
+        hash = "sha256-rIl9BqDJAlb0KXcSy1A+spFz+8bX+Kk2/0dsS3Ll824=";
       };
 
-      nugetDeps = ./deps.json;
+      nativeBuildInputs = [ pkgs.unzip ];
 
-      projectFile = "PkgTool/PkgTool.csproj";
+      unpackPhase = ''
+        unzip $src -d .
+      '';
+
+      installPhase = ''
+        mkdir -p $out/bin
+        mv PkgTool.Core $out/bin/
+      '';
     };
-  }
-)
+}
