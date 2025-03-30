@@ -4,4 +4,5 @@ flake-utils.lib.meld inputs [
   ./musl.nix
   ./orbis-lib-gen.nix
   ./stubs.nix
+  ./LibOrbisPkg
 ]
