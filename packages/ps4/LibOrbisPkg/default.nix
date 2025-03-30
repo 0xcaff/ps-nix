@@ -29,7 +29,15 @@ flake-utils.lib.eachSystem supported-systems (
 
       nugetDeps = ./deps.json;
 
-      projectFile = "PkgTool/PkgTool.csproj";
+      projectFile = "PkgTool.Core/PkgTool.Core.csproj";
+      preConfigureNuGet = ''
+        cp ${./nuget.config} nuget.config
+      '';
+
+      executables = "PkgTool.Core";
+      selfContainedBuild = true;
+
+      dotnetBuildFlags = "-p:InvariantGlobalization=true";
     };
   }
 )
