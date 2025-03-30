@@ -1,5 +1,5 @@
 {
-  description = "A collection of tools for ps4 development";
+  description = "a collection of tools for ps homebrew development";
 
   inputs = {
     flake-utils.url = "github:numtide/flake-utils";
@@ -9,6 +9,7 @@
   outputs =
     inputs@{ flake-utils, ... }:
     flake-utils.lib.meld inputs [
-      ./packages
+      ./packages/ps4
+      ./packages/ps2
     ];
 }
