@@ -39,7 +39,6 @@ flake-utils.lib.eachSystem supported-systems (
             cd build
 
             ../configure \
-              --quiet \
               --prefix="$out" \
               --target="mips64r5900el-ps2-elf" \
               --enable-languages="c" \

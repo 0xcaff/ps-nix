@@ -18,24 +18,20 @@ flake-utils.lib.eachSystem supported-systems (
   in
   {
     packages = flake-utils.lib.flattenTree {
-      binutils-gdb =
+      newlib =
         pkgs.stdenv.mkDerivation {
-          name = "binutils-gdb";
-          version = "ee-v2.44.0";
+          name = "newlib";
+          version = "ee-v4.5.0";
 
           src = pkgs.fetchFromGitHub {
             owner = "ps2dev";
-            repo = "binutils-gdb";
-            rev = "94bfc7644361b2d610a60203372c7bd676b38606";
-            sha256 = "sha256-g0YihbgEW1SsGbgi8r1iKqUj8sJmJE2Y3gVvm+98bAc=";
+            repo = "newlib";
+            rev = "646299801c7f8b199491aee3d278151138da333e";
+            sha256 = pkgs.lib.fakeHash;
           };
-
-          buildInputs = [ pkgs.gmp pkgs.mpfr pkgs.texinfo pkgs.bison pkgs.flex pkgs.perl ];
 
           patchPhase = ''
             patchShebangs .
-            substituteInPlace ltmain.sh libtool.m4 libsframe/configure binutils/configure bfd/configure zlib/configure opcodes/configure gas/configure gprof/configure libbacktrace/configure gdb/configure \
-              --replace-fail '/usr/bin/file' '${pkgs.file}/bin/file'
           '';
 
           configurePhase = ''
@@ -44,16 +40,15 @@ flake-utils.lib.eachSystem supported-systems (
 
             ../configure \
               --prefix="$out" \
-              --with-sysroot="$out/mips64r5900el-ps2-elf" \
               --target=mips64r5900el-ps2-elf \
-              --disable-separate-code \
-              --disable-sim \
-              --disable-nls \
-              --with-python=no
+              --with-sysroot="out/mips64r5900el-ps2-elf" \
+              --enable-newlib-retargetable-locking \
+              --enable-newlib-multithread \
+              --enable-newlib-io-c99-formats
           '';
 
           buildPhase = ''
-            make -j $NIX_BUILD_CORES
+            make -j $NIX_BUILD_CORES all
           '';
 
           installPhase = ''
