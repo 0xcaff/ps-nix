@@ -26,11 +26,20 @@ flake-utils.lib.eachSystem supported-systems (
           owner = "ps2dev";
           repo = "gcc";
           rev = "5c68fdf5209b133fb878dee62035eb8ff3ae4024";
-          sha256 = pkgs.lib.fakeHash;
+          sha256 = "sha256-SsFk3Nlg6AR+wV/VHKdvDNBkbFw9yK029JUNxdYxEds=";
         };
+
+        buildInputs = [
+          pkgs.gmp
+          pkgs.libmpc
+          pkgs.mpfr
+          pkgs.texinfo
+        ];
 
         patchPhase = ''
           patchShebangs .
+          substituteInPlace {libbacktrace,lto-plugin,gcc}/configure \
+            --replace-fail '/usr/bin/file' '${pkgs.file}/bin/file'
         '';
 
         configurePhase = ''
@@ -38,6 +47,7 @@ flake-utils.lib.eachSystem supported-systems (
           cd build
 
           ../configure \
+            --quiet \
             --prefix="$out" \
             --target="mips64r5900el-ps2-elf" \
             --enable-languages="c" \
@@ -58,12 +68,12 @@ flake-utils.lib.eachSystem supported-systems (
         '';
 
         buildPhase = ''
-          make -j "$NIX_BUILD_CORES" all-gcc
+          make --quiet -j "$NIX_BUILD_CORES" all-gcc
         '';
 
         installPhase = ''
           mkdir -p $out
-          make -j "$NIX_BUILD_CORES" install-gcc
+          make --quiet -j "$NIX_BUILD_CORES" install-gcc
         '';
       };
     };

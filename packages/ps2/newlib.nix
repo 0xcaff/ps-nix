@@ -26,7 +26,7 @@ flake-utils.lib.eachSystem supported-systems (
           owner = "ps2dev";
           repo = "newlib";
           rev = "646299801c7f8b199491aee3d278151138da333e";
-          sha256 = pkgs.lib.fakeHash;
+          sha256 = "sha256-rvWXtLk0MVAyOxMSOHhPVvsMa9ZP+1ZfJLSqSpfTWks=";
         };
 
         patchPhase = ''
