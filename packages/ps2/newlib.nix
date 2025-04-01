@@ -40,7 +40,7 @@ flake-utils.lib.eachSystem supported-systems (
           ../configure \
             --prefix="$out" \
             --target=mips64r5900el-ps2-elf \
-            --with-sysroot="out/mips64r5900el-ps2-elf" \
+            --with-sysroot="$out/mips64r5900el-ps2-elf" \
             --enable-newlib-retargetable-locking \
             --enable-newlib-multithread \
             --enable-newlib-io-c99-formats
