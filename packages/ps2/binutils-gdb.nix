@@ -53,9 +53,13 @@ flake-utils.lib.eachSystem supported-systems (
               --with-python=no
           '';
 
+          buildPhase = ''
+            make -j $NIX_BUILD_CORES
+          '';
+
           installPhase = ''
             mkdir -p $out
-            make install-strip
+            make -j $NIX_BUILD_CORES install-strip
           '';
         };
     };
