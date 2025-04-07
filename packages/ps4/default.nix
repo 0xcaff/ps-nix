@@ -7,4 +7,5 @@ flake-utils.lib.meld inputs [
   ./LibOrbisPkg
   ./create-gp4.nix
   ./readoelf.nix
+  ./libcxx.nix
 ]
