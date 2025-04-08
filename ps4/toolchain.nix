@@ -114,7 +114,7 @@ flake-utils.lib.eachSystem supported-systems (
       '';
     };
 
-    libcxx = pkgs.stdenv.mkDerivation {
+    libcxx = pkgs.stdenvNoCC.mkDerivation {
       name = "libcxx";
       src = llvmProjectSrc;
 
@@ -133,6 +133,8 @@ flake-utils.lib.eachSystem supported-systems (
         "unpackPhase"
         "buildPhase"
       ];
+
+      hardeningDisable = [ "fortify" ];
 
       buildPhase = ''
         mkdir compiler-rt/build && cd compiler-rt/build
@@ -276,6 +278,7 @@ flake-utils.lib.eachSystem supported-systems (
         ar -M < mri.txt
         rm $out/lib/libc.a
         mv $out/lib/{libcM.a,libc.a}
+        mv link.x $out/
       '';
     };
   }

@@ -28,6 +28,7 @@ flake-utils.lib.eachSystem supported-systems (
       };
 
       nugetDeps = ./deps.json;
+      runtimeDeps = [ pkgs.openssl_1_1 ];
 
       projectFile = "PkgTool.Core/PkgTool.Core.csproj";
       preConfigureNuGet = ''
