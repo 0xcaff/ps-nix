@@ -9,7 +9,7 @@
   outputs =
     inputs@{ flake-utils, ... }:
     flake-utils.lib.meld inputs [
-      ./packages/ps4
-      ./packages/ps2
+      ./ps4
+      ./ps2
     ];
 }
