@@ -121,7 +121,6 @@ flake-utils.lib.eachSystem supported-systems (
       buildInputs = with pkgs; [
         clang
         cmake
-        python2
         (python3.withPackages (
           ps: with ps; [
             setuptools
