@@ -45,7 +45,6 @@ flake-utils.lib.eachSystem supported-systems (
                 rm {cmd/create-fself,pkg/oelf,pkg/fself}/go.mod
                 rm cmd/create-fself/go-linux.mod
                 rm Makefile
-                ls -la
               '';
 
               installPhase = ''
