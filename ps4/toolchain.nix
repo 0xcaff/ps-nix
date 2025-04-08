@@ -246,7 +246,10 @@ flake-utils.lib.eachSystem supported-systems (
         "installPhase"
       ];
 
-      buildInputs = [ pkgs.clang pkgs.rsync ];
+      buildInputs = [
+        pkgs.clang
+        pkgs.rsync
+      ];
 
       installPhase = ''
         mkdir -p $out/{lib,bin}
