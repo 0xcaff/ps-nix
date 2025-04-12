@@ -4,4 +4,5 @@ flake-utils.lib.meld inputs [
   ./002-gcc-stage1.nix
   ./003-newlib.nix
   ./004-newlib-nano.nix
+  ./005-pthread-embedded.nix
 ]
