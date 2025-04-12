@@ -1,6 +1,5 @@
 inputs@{ flake-utils, ... }:
 flake-utils.lib.meld inputs [
-  ./ee
-  ./iop
-  ./dvp
+  ./001-binutils.nix
+  ./002-gcc-stage1.nix
 ]
