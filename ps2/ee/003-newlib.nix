@@ -69,7 +69,7 @@ done < <(env)
         '';
 
         buildPhase = ''
-          make --trace -j $NIX_BUILD_CORES all || { echo "configure failed"; cat config.log; exit 1; }
+          make --trace -j $NIX_BUILD_CORES all
         '';
 
         installPhase = ''
