@@ -62,15 +62,22 @@ flake-utils.lib.eachSystem supported-systems (
               --with-float=hard \
               --with-as=${self.packages.${system}.binutils-gdb}/ee/bin/mips64r5900el-ps2-elf-as \
               --with-sysroot=${
-                pkgs.buildEnv {
-                  name = "sysroot";
-                  paths = [
+                let
+                  srcs = [
                     "${self.packages.${system}.newlib}/ee/mips64r5900el-ps2-elf"
-                    "${self.packages.${system}.binutils-gdb}/ee"
+                    "${self.packages.${system}.binutils-gdb}/ee/mips64r5900el-ps2-elf"
                     "${self.packages.${system}.pthread-embedded}/ee/mips64r5900el-ps2-elf"
                   ];
-                  pathsToLink = [ "/" ];
-                }
+                in
+
+                pkgs.runCommand "sysroot" { inherit srcs; } ''
+                  mkdir -p "$out"
+
+                  for src in ${pkgs.lib.concatStringsSep " " srcs}; do
+                    echo "Merging from $src"
+                    ${pkgs.rsync}/bin/rsync -aL "$src"/ "$out"/
+                  done
+                ''
               } \
               --with-native-system-header-dir="/include" \
               --with-newlib \
