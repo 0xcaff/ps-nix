@@ -31,7 +31,9 @@ flake-utils.lib.eachSystem supported-systems (
 
         preBuild = ''
           export PS2DEV=$out
-          export PATH=$PATH:${self.packages.${system}.binutils-gdb}/ee/bin:${self.packages.${system}.gcc}/ee/bin
+          export PATH=$PATH:${
+            self.packages.${system}.binutils-gdb
+          }/ee/bin:${self.packages.${system}.gcc}/ee/bin
           cd platform/ps2
           export GLOBAL_CFLAGS="-isystem ${self.packages.${system}.newlib}/ee/mips64r5900el-ps2-elf/include"
         '';

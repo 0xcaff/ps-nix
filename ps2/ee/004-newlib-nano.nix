@@ -29,7 +29,13 @@ flake-utils.lib.eachSystem supported-systems (
           sha256 = "sha256-rvWXtLk0MVAyOxMSOHhPVvsMa9ZP+1ZfJLSqSpfTWks=";
         };
 
-        buildInputs = [ pkgs.gcc pkgs.isl_0_24 pkgs.libmpc pkgs.mpfr pkgs.gmp ];
+        buildInputs = [
+          pkgs.gcc
+          pkgs.isl_0_24
+          pkgs.libmpc
+          pkgs.mpfr
+          pkgs.gmp
+        ];
 
         patchPhase = ''
           patchShebangs .
@@ -39,7 +45,9 @@ flake-utils.lib.eachSystem supported-systems (
           mkdir build
           cd build
 
-          export PATH=$PATH:${self.packages.${system}.binutils-gdb}/ee/bin:${self.packages.${system}.gcc}/ee/bin
+          export PATH=$PATH:${
+            self.packages.${system}.binutils-gdb
+          }/ee/bin:${self.packages.${system}.gcc}/ee/bin
 
           echo "Unsetting *_FOR_TARGET env vars not matching FLAGS and not starting with NIX..."
           while IFS='=' read -r name _; do
@@ -59,10 +67,15 @@ flake-utils.lib.eachSystem supported-systems (
           ../configure \
             --prefix="$PS2DEV/$TARGET_ALIAS" \
             --target="$TARGET" \
-            --with-sysroot=${pkgs.symlinkJoin {
-              name = "sysroot";
-              paths = [ "${self.packages.${system}.binutils-gdb}/ee" "${self.packages.${system}.gcc}/ee" ];
-            }} \
+            --with-sysroot=${
+              pkgs.symlinkJoin {
+                name = "sysroot";
+                paths = [
+                  "${self.packages.${system}.binutils-gdb}/ee"
+                  "${self.packages.${system}.gcc}/ee"
+                ];
+              }
+            } \
             --disable-newlib-supplied-syscalls \
             --enable-newlib-reent-small \
             --disable-newlib-fvwrite-in-streamio \
