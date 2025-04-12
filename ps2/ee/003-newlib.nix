@@ -41,13 +41,13 @@ flake-utils.lib.eachSystem supported-systems (
 
           export PATH=$PATH:${self.packages.${system}.binutils-gdb}/ee/bin:${self.packages.${system}.gcc}/ee/bin
 
-echo "Unsetting *_FOR_TARGET env vars not matching FLAGS and not starting with NIX..."
-while IFS='=' read -r name _; do
-  if [[ "$name" == *_FOR_TARGET ]] && [[ "$name" != *FLAGS* ]] && [[ "$name" != NIX* ]]; then
-    unset "$name"
-    echo "unset $name"
-  fi
-done < <(env)
+          echo "Unsetting *_FOR_TARGET env vars not matching FLAGS and not starting with NIX..."
+          while IFS='=' read -r name _; do
+            if [[ "$name" == *_FOR_TARGET ]] && [[ "$name" != *FLAGS* ]] && [[ "$name" != NIX* ]]; then
+              unset "$name"
+              echo "unset $name"
+            fi
+          done < <(env)
 
           printenv
 
