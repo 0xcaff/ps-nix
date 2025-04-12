@@ -18,7 +18,7 @@ flake-utils.lib.eachSystem supported-systems (
   in
   {
     packages = flake-utils.lib.flattenTree {
-      binutils-gdb = pkgs.stdenv.mkDerivation {
+      binutils-gdb = pkgs.stdenvNoCC.mkDerivation {
         name = "binutils-gdb";
         version = "ee-v2.44.0";
 
@@ -36,11 +36,12 @@ flake-utils.lib.eachSystem supported-systems (
           pkgs.bison
           pkgs.flex
           pkgs.perl
+          pkgs.gcc
         ];
 
         patchPhase = ''
           patchShebangs .
-          substituteInPlace ltmain.sh libtool.m4 libsframe/configure binutils/configure bfd/configure zlib/configure opcodes/configure gas/configure gprof/configure libbacktrace/configure gdb/configure \
+          substituteInPlace ltmain.sh libtool.m4 {libsframe,binutils,zlib,opcodes,gas,gprof,libbacktrace,gdb,libctf}/configure \
             --replace-fail '/usr/bin/file' '${pkgs.file}/bin/file'
         '';
 
@@ -48,10 +49,14 @@ flake-utils.lib.eachSystem supported-systems (
           mkdir build
           cd build
 
+          PS2DEV=$out
+          TARGET_ALIAS=ee
+          TARGET=mips64r5900el-ps2-elf
+
           ../configure \
-            --prefix="$out" \
-            --with-sysroot="$out/mips64r5900el-ps2-elf" \
-            --target=mips64r5900el-ps2-elf \
+            --prefix="$PS2DEV/$TARGET_ALIAS" \
+            --target="$TARGET" \
+            --with-sysroot="$PS2DEV/$TARGET_ALIAS/$TARGET" \
             --disable-separate-code \
             --disable-sim \
             --disable-nls \
