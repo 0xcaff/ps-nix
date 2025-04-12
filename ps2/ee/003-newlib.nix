@@ -39,21 +39,33 @@ flake-utils.lib.eachSystem supported-systems (
           mkdir build
           cd build
 
+          export PATH=$PATH:${self.packages.${system}.binutils-gdb}/ee/bin:${self.packages.${system}.gcc}/ee/bin
+
+echo "Unsetting *_FOR_TARGET env vars not matching FLAGS and not starting with NIX..."
+while IFS='=' read -r name _; do
+  if [[ "$name" == *_FOR_TARGET ]] && [[ "$name" != *FLAGS* ]] && [[ "$name" != NIX* ]]; then
+    unset "$name"
+    echo "unset $name"
+  fi
+done < <(env)
+
+          printenv
+
           PS2DEV=$out
           TARGET_ALIAS=ee
           TARGET=mips64r5900el-ps2-elf
+          export CFLAGS_FOR_TARGET="-O2 -gdwarf-2 -gz"
 
-          CFLAGS_FOR_TARGET="-O2 -gdwarf-2 -gz"
-            ../configure \
-              --prefix="$PS2DEV/$TARGET_ALIAS" \
-              --target="$TARGET" \
-              --with-sysroot=${pkgs.symlinkJoin {
-                name = "sysroot";
-                paths = [ "${self.packages.${system}.binutils-gdb}/ee" "${self.packages.${system}.gcc}/ee" ];
-              }} \
-              --enable-newlib-retargetable-locking \
-              --enable-newlib-multithread \
-              --enable-newlib-io-c99-formats
+          ../configure \
+            --prefix="$PS2DEV/$TARGET_ALIAS" \
+            --target="$TARGET" \
+            --with-sysroot=${pkgs.symlinkJoin {
+              name = "sysroot";
+              paths = [ "${self.packages.${system}.binutils-gdb}/ee" "${self.packages.${system}.gcc}/ee" ];
+            }} \
+            --enable-newlib-retargetable-locking \
+            --enable-newlib-multithread \
+            --enable-newlib-io-c99-formats
         '';
 
         buildPhase = ''
