@@ -18,7 +18,7 @@ flake-utils.lib.eachSystem supported-systems (
   in
   {
     packages = flake-utils.lib.flattenTree {
-      gcc = pkgs.stdenvNoCC.mkDerivation {
+      gcc2 = pkgs.stdenvNoCC.mkDerivation {
         name = "gcc";
         version = "ee-v14.2.0";
 
@@ -55,33 +55,40 @@ flake-utils.lib.eachSystem supported-systems (
 
           TARGET_CFLAGS="-O2 -gdwarf-2 -gz" \
             ../configure \
+              --quiet \
               --prefix="$PS2DEV/$TARGET_ALIAS" \
               --target="$TARGET" \
-              --with-as=${self.packages.${system}.binutils-gdb}/ee/bin/mips64r5900el-ps2-elf-as \
-              --enable-languages="c" \
+              --enable-languages="c,c++" \
               --with-float=hard \
-              --without-headers \
-              --without-newlib \
-              --disable-libgcc \
-              --disable-shared \
-              --disable-threads \
+              --with-as=${self.packages.${system}.binutils-gdb}/ee/bin/mips64r5900el-ps2-elf-as \
+              --with-sysroot=${
+                pkgs.buildEnv {
+                  name = "sysroot";
+                  paths = [
+                    "${self.packages.${system}.newlib}/ee/mips64r5900el-ps2-elf"
+                    "${self.packages.${system}.binutils-gdb}/ee"
+                    "${self.packages.${system}.pthread-embedded}/ee/mips64r5900el-ps2-elf"
+                  ];
+                  pathsToLink = [ "/" ];
+                }
+              } \
+              --with-native-system-header-dir="/include" \
+              --with-newlib \
+              --disable-libssp \
               --disable-multilib \
-              --disable-libatomic \
               --disable-nls \
               --disable-tls \
-              --disable-libssp \
-              --disable-libgomp \
-              --disable-libmudflap \
-              --disable-libquadmath
+              --enable-cxx-flags=-G0 \
+              --enable-threads=posix
         '';
 
         buildPhase = ''
-          make -j "$NIX_BUILD_CORES" all-gcc
+          make -j "$NIX_BUILD_CORES" all
         '';
 
         installPhase = ''
           mkdir -p $out
-          make -j "$NIX_BUILD_CORES" install-gcc
+          make -j "$NIX_BUILD_CORES" install-strip
         '';
       };
     };
