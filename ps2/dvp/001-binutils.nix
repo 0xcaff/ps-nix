@@ -46,9 +46,9 @@ flake-utils.lib.eachSystem supported-systems (
         '';
 
         configureFlags = [
-            "--target=dvp"
-            "--disable-nls"
-            "--disable-build-warnings"
+          "--target=dvp"
+          "--disable-nls"
+          "--disable-build-warnings"
         ];
 
         dontUpdateAutotoolsGnuConfigScripts = true;
