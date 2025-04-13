@@ -33,16 +33,22 @@ flake-utils.lib.eachSystem supported-systems (
           addToSearchPath PATH @out@/dvp/bin
         '';
 
-        phases = [ "unpackPhase" "patchPhase" "configurePhase" "buildPhase" "installPhase" ];
+        phases = [
+          "unpackPhase"
+          "patchPhase"
+          "configurePhase"
+          "buildPhase"
+          "installPhase"
+        ];
 
         buildInputs = [
-                  pkgs.gmp
-                  pkgs.mpfr
-                  pkgs.texinfo
-                  pkgs.bison
-                  pkgs.flex
-                  pkgs.perl
-                  pkgs.gcc
+          pkgs.gmp
+          pkgs.mpfr
+          pkgs.texinfo
+          pkgs.bison
+          pkgs.flex
+          pkgs.perl
+          pkgs.gcc
         ];
 
         patchPhase = ''

@@ -34,13 +34,13 @@ flake-utils.lib.eachSystem supported-systems (
         '';
 
         buildInputs = [
-                    pkgs.gmp
-                    pkgs.mpfr
-                    pkgs.texinfo
-                    pkgs.bison
-                    pkgs.flex
-                    pkgs.perl
-                    pkgs.gcc
+          pkgs.gmp
+          pkgs.mpfr
+          pkgs.texinfo
+          pkgs.bison
+          pkgs.flex
+          pkgs.perl
+          pkgs.gcc
         ];
 
         patchPhase = ''
