@@ -1,0 +1,13 @@
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  build:
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@main
+      - run: nix copy .#packages.x86_64-linux.ps2dev --to "s3://ps-nix-cache?endpoint=${{ vars.S3_ENDPOINT }}&compression=zstd"
