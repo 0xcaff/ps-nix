@@ -18,8 +18,8 @@ flake-utils.lib.eachSystem supported-systems (
   in
   {
     packages = flake-utils.lib.flattenTree {
-      iop-binutils-gdb = pkgs.stdenvNoCC.mkDerivation {
-        name = "binutils-gdb";
+      iop-binutils = pkgs.stdenvNoCC.mkDerivation {
+        name = "iop-binutils";
         version = "binutils-2_43_1";
 
         src = pkgs.fetchFromGitHub {
@@ -28,6 +28,10 @@ flake-utils.lib.eachSystem supported-systems (
           rev = "f4c0f07037e79d5fc1c3be3172c6c7d60a9144f7";
           sha256 = "sha256-2tzItSMVmAb8jcTKODRztXFY40DcL8KItBq0qTjb/tA=";
         };
+
+        setupHook = pkgs.writeText "setupHook.sh" ''
+          addToSearchPath PATH @out@/iop/bin
+        '';
 
         buildInputs = [
                     pkgs.gmp

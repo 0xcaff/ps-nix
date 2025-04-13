@@ -18,8 +18,8 @@ flake-utils.lib.eachSystem supported-systems (
   in
   {
     packages = flake-utils.lib.flattenTree {
-      gcc = pkgs.stdenvNoCC.mkDerivation {
-        name = "gcc";
+      ee-gcc-stage1 = pkgs.stdenvNoCC.mkDerivation {
+        name = "ee-gcc-stage1";
         version = "ee-v14.2.0";
 
         src = pkgs.fetchFromGitHub {
@@ -36,6 +36,7 @@ flake-utils.lib.eachSystem supported-systems (
           pkgs.texinfo
           pkgs.gcc
           pkgs.flex
+          self.packages.${system}.ee-binutils
         ];
 
         patchPhase = ''
@@ -44,8 +45,11 @@ flake-utils.lib.eachSystem supported-systems (
             --replace-fail '/usr/bin/file' '${pkgs.file}/bin/file'
         '';
 
+        setupHook = pkgs.writeText "setupHook.sh" ''
+          addToSearchPath PATH @out@/ee/bin
+        '';
+
         configurePhase = ''
-          export PATH=$PATH:${self.packages.${system}.binutils-gdb}/ee/bin
           mkdir build
           cd build
 
@@ -57,7 +61,7 @@ flake-utils.lib.eachSystem supported-systems (
             ../configure \
               --prefix="$PS2DEV/$TARGET_ALIAS" \
               --target="$TARGET" \
-              --with-as=${self.packages.${system}.binutils-gdb}/ee/bin/mips64r5900el-ps2-elf-as \
+              --with-as=${self.packages.${system}.ee-binutils}/ee/bin/mips64r5900el-ps2-elf-as \
               --enable-languages="c" \
               --with-float=hard \
               --without-headers \

@@ -44,7 +44,15 @@ flake-utils.lib.eachSystem supported-systems (
           sha256 = "sha256-ew6yFB6iyYmk7NOeF8+9oIvqHguKh6zKJoDGwhusEs4=";
         };
 
-        buildInputs = [ pkgs.gcc pkgs.rsync ];
+        buildInputs = [
+        pkgs.gcc pkgs.rsync
+
+         self.packages.${system}.ee-gcc-stage1
+         self.packages.${system}.iop-gcc
+         self.packages.${system}.dvp-binutils
+         self.packages.${system}.ee-gcc-stage2
+         self.packages.${system}.ee-binutils
+         ];
 
         postUnpack = ''
           rsync --chmod=ugo+w -r ${lwip}/ source/common/external_deps/lwip/
@@ -56,7 +64,6 @@ flake-utils.lib.eachSystem supported-systems (
         '';
 
         preConfigure = ''
-          export PATH=$PATH:${self.packages.${system}.iop-binutils-gdb}/iop/bin:${self.packages.${system}.iop-gcc}/iop/bin:${self.packages.${system}.dvp-binutils}/dvp/bin:${self.packages.${system}.gcc2}/ee/bin:${self.packages.${system}.binutils-gdb}/ee/bin
           export EE_CFLAGS="-isystem ${self.packages.${system}.newlib}/ee/mips64r5900el-ps2-elf/include"
           export EE_LDFLAGS="-L${self.packages.${system}.newlib-nano}/ee/mips64r5900el-ps2-elf/lib -L${self.packages.${system}.newlib}/ee/mips64r5900el-ps2-elf/lib"
           export PS2SDK=$out/sdk

@@ -29,11 +29,13 @@ flake-utils.lib.eachSystem supported-systems (
           sha256 = "sha256-k6fR1RxblNehIdQn22E9vbL4hsRZFphKIsbZAxsD/QE=";
         };
 
+        buildInputs = [
+          self.packages.${system}.ee-binutils
+          self.packages.${system}.ee-gcc-stage1
+        ];
+
         preBuild = ''
           export PS2DEV=$out
-          export PATH=$PATH:${
-            self.packages.${system}.binutils-gdb
-          }/ee/bin:${self.packages.${system}.gcc}/ee/bin
           cd platform/ps2
           export GLOBAL_CFLAGS="-isystem ${self.packages.${system}.newlib}/ee/mips64r5900el-ps2-elf/include"
         '';

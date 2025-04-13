@@ -18,8 +18,8 @@ flake-utils.lib.eachSystem supported-systems (
   in
   {
     packages = flake-utils.lib.flattenTree {
-      gcc2 = pkgs.stdenvNoCC.mkDerivation {
-        name = "gcc";
+      ee-gcc-stage2 = pkgs.stdenvNoCC.mkDerivation {
+        name = "ee-gcc-stage2";
         version = "ee-v14.2.0";
 
         src = pkgs.fetchFromGitHub {
@@ -36,6 +36,7 @@ flake-utils.lib.eachSystem supported-systems (
           pkgs.texinfo
           pkgs.gcc
           pkgs.flex
+          self.packages.${system}.ee-binutils
         ];
 
         patchPhase = ''
@@ -44,8 +45,11 @@ flake-utils.lib.eachSystem supported-systems (
             --replace-fail '/usr/bin/file' '${pkgs.file}/bin/file'
         '';
 
+        setupHook = pkgs.writeText "setupHook.sh" ''
+          addToSearchPath PATH @out@/ee/bin
+        '';
+
         configurePhase = ''
-          export PATH=$PATH:${self.packages.${system}.binutils-gdb}/ee/bin
           mkdir build
           cd build
 
@@ -60,14 +64,14 @@ flake-utils.lib.eachSystem supported-systems (
               --target="$TARGET" \
               --enable-languages="c,c++" \
               --with-float=hard \
-              --with-as=${self.packages.${system}.binutils-gdb}/ee/bin/mips64r5900el-ps2-elf-as \
-              --with-ld=${self.packages.${system}.binutils-gdb}/ee/bin/mips64r5900el-ps2-elf-ld \
+              --with-as=${self.packages.${system}.ee-binutils}/ee/bin/mips64r5900el-ps2-elf-as \
+              --with-ld=${self.packages.${system}.ee-binutils}/ee/bin/mips64r5900el-ps2-elf-ld \
               --with-sysroot=${
                 let
                   srcs = [
                     "${self.packages.${system}.newlib}/ee/mips64r5900el-ps2-elf"
                     "${self.packages.${system}.newlib-nano}/ee/mips64r5900el-ps2-elf"
-                    "${self.packages.${system}.binutils-gdb}/ee/mips64r5900el-ps2-elf"
+                    "${self.packages.${system}.ee-binutils}/ee/mips64r5900el-ps2-elf"
                     "${self.packages.${system}.pthread-embedded}/ee/mips64r5900el-ps2-elf"
                   ];
                 in

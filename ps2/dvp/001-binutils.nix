@@ -19,7 +19,7 @@ flake-utils.lib.eachSystem supported-systems (
   {
     packages = flake-utils.lib.flattenTree {
       dvp-binutils = pkgs.stdenvNoCC.mkDerivation {
-        name = "binutils-gdb";
+        name = "dvp-binutils";
         version = "dvp-v2.44.0";
 
         src = pkgs.fetchFromGitHub {
@@ -28,6 +28,10 @@ flake-utils.lib.eachSystem supported-systems (
           rev = "0aef5ed1686ba47069392798a5d4fd03d183bf8a";
           sha256 = "sha256-gKldknLyP22v+b5nynrJwY0THj84dQD39/b4THhoayI=";
         };
+
+        setupHook = pkgs.writeText "setupHook.sh" ''
+          addToSearchPath PATH @out@/dvp/bin
+        '';
 
         phases = [ "unpackPhase" "patchPhase" "configurePhase" "buildPhase" "installPhase" ];
 

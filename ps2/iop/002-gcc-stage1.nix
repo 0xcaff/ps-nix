@@ -37,6 +37,7 @@ flake-utils.lib.eachSystem supported-systems (
           pkgs.gcc
           pkgs.flex
           pkgs.isl_0_24
+          self.packages.${system}.iop-binutils
         ];
 
         patchPhase = ''
@@ -46,8 +47,6 @@ flake-utils.lib.eachSystem supported-systems (
         '';
 
         configurePhase = ''
-          export PATH=$PATH:${self.packages.${system}.iop-binutils-gdb}/iop/bin
-
           mkdir build
           cd build
 
@@ -58,7 +57,7 @@ flake-utils.lib.eachSystem supported-systems (
           TARGET_CFLAGS="-O2 -gdwarf-2 -gz" \
             ../configure \
               --quiet \
-              --with-as=${self.packages.${system}.iop-binutils-gdb}/iop/bin/mipsel-none-elf-as \
+              --with-as=${self.packages.${system}.iop-binutils}/iop/bin/mipsel-none-elf-as \
               --prefix="$PS2DEV/$TARGET_ALIAS" \
               --target="$TARGET" \
               --enable-languages="c,c++" \

@@ -35,6 +35,8 @@ flake-utils.lib.eachSystem supported-systems (
           pkgs.libmpc
           pkgs.mpfr
           pkgs.gmp
+          self.packages.${system}.ee-binutils
+          self.packages.${system}.ee-gcc-stage1
         ];
 
         patchPhase = ''
@@ -44,10 +46,6 @@ flake-utils.lib.eachSystem supported-systems (
         configurePhase = ''
           mkdir build
           cd build
-
-          export PATH=$PATH:${
-            self.packages.${system}.binutils-gdb
-          }/ee/bin:${self.packages.${system}.gcc}/ee/bin
 
           echo "Unsetting *_FOR_TARGET env vars not matching FLAGS and not starting with NIX..."
           while IFS='=' read -r name _; do
@@ -71,8 +69,8 @@ flake-utils.lib.eachSystem supported-systems (
               pkgs.symlinkJoin {
                 name = "sysroot";
                 paths = [
-                  "${self.packages.${system}.binutils-gdb}/ee"
-                  "${self.packages.${system}.gcc}/ee"
+                  "${self.packages.${system}.ee-binutils}/ee"
+                  "${self.packages.${system}.ee-gcc-stage1}/ee"
                 ];
               }
             } \

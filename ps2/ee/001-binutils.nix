@@ -18,8 +18,8 @@ flake-utils.lib.eachSystem supported-systems (
   in
   {
     packages = flake-utils.lib.flattenTree {
-      binutils-gdb = pkgs.stdenvNoCC.mkDerivation {
-        name = "binutils-gdb";
+      ee-binutils = pkgs.stdenvNoCC.mkDerivation {
+        name = "ee-binutils";
         version = "ee-v2.44.0";
 
         src = pkgs.fetchFromGitHub {
@@ -28,6 +28,10 @@ flake-utils.lib.eachSystem supported-systems (
           rev = "94bfc7644361b2d610a60203372c7bd676b38606";
           sha256 = "sha256-g0YihbgEW1SsGbgi8r1iKqUj8sJmJE2Y3gVvm+98bAc=";
         };
+
+        setupHook = pkgs.writeText "setupHook.sh" ''
+          addToSearchPath PATH @out@/ee/bin
+        '';
 
         buildInputs = [
           pkgs.gmp
