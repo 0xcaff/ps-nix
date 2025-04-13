@@ -76,10 +76,31 @@ flake-utils.lib.eachSystem supported-systems (
           patchShebangs .
         '';
       };
+    eeMerged = pkgs.buildEnv {
+      name = "ee-merged";
+      paths = [
+        ee.toolchain
+        ee.sysroot
+      ];
+      pathsToLink = [ "/" ];
+    };
   in
   {
     packages = flake-utils.lib.flattenTree {
-      inherit ps2sdk;
+      ps2dev = pkgs.runCommand "ps2dev" {
+        setupHook = pkgs.writeText ''
+          export PS2DEV=@out@
+          export PS2SDK=$PS2DEV/ps2sdk
+          export GSKIT=$PS2DEV/gsKit
+          export PATH=$PATH:$PS2DEV/bin:$PS2DEV/ee/bin:$PS2DEV/iop/bin:$PS2DEV/dvp/bin:$PS2SDK/bin
+        '';
+      } ''
+        mkdir -p $out
+        ln -s ${dvp} $out/dvp
+        ln -s ${iop} $out/iop
+        ln -s ${ps2sdk} $out/ps2sdk
+        ln -s ${eeMerged} $out/ee
+      '';
     };
   }
 )
