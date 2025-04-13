@@ -87,14 +87,7 @@ flake-utils.lib.eachSystem supported-systems (
   in
   {
     packages = flake-utils.lib.flattenTree {
-      ps2dev = pkgs.runCommand "ps2dev" {
-        setupHook = pkgs.writeText ''
-          export PS2DEV=@out@
-          export PS2SDK=$PS2DEV/ps2sdk
-          export GSKIT=$PS2DEV/gsKit
-          export PATH=$PATH:$PS2DEV/bin:$PS2DEV/ee/bin:$PS2DEV/iop/bin:$PS2DEV/dvp/bin:$PS2SDK/bin
-        '';
-      } ''
+      ps2dev = pkgs.runCommand "ps2dev" {} ''
         mkdir -p $out
         ln -s ${dvp} $out/dvp
         ln -s ${iop} $out/iop
