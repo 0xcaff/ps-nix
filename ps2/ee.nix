@@ -335,7 +335,7 @@ let
       pkgs.texinfo
       pkgs.gcc
       pkgs.flex
-      binutils-stage1
+      binutils-stage2
     ];
 
     patchPhase = ''
