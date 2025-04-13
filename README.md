@@ -23,6 +23,6 @@ of main versions. they probably only work on x86_64-linux (maybe arm linux too).
 ## getting started
 
 ```
-nix shell github:0xcaff/psnix#ps4
-nix shell github:0xcaff/psnix#ps2
+nix shell github:0xcaff/ps-nix#ps4
+nix shell github:0xcaff/ps-nix#ps2
 ```
