@@ -61,6 +61,7 @@ flake-utils.lib.eachSystem supported-systems (
               --enable-languages="c,c++" \
               --with-float=hard \
               --with-as=${self.packages.${system}.binutils-gdb}/ee/bin/mips64r5900el-ps2-elf-as \
+              --with-ld=${self.packages.${system}.binutils-gdb}/ee/bin/mips64r5900el-ps2-elf-ld \
               --with-sysroot=${
                 let
                   srcs = [
