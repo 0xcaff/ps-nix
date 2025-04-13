@@ -272,9 +272,11 @@ let
       mkdir -p "$out"
 
       for src in ${pkgs.lib.concatStringsSep " " srcs}; do
-        echo "Merging from $src"
-        ${pkgs.rsync}/bin/rsync -aL "$src"/ "$out"/
+        (cd "$src" && find . -type d -exec mkdir -p "$out/{}" \;)
+        (cd "$src" && find . -type f -exec ln -sf "$src/{}" "$out/{}" \;)
       done
+
+      rm $out/lib/crt0.o
     '';
 
   binutils-stage2 = pkgs.stdenvNoCC.mkDerivation {
@@ -386,10 +388,14 @@ let
     dontUpdateAutotoolsGnuConfigScripts = true;
   };
 in
-pkgs.buildEnv {
-  name = "ee-toolchain";
-  paths = [
-    binutils-stage2
-    gcc-stage2
-  ];
+{
+  toolchain = pkgs.buildEnv {
+    name = "ee-toolchain";
+    paths = [
+      binutils-stage2
+      gcc-stage2
+    ];
+    pathsToLink = [ "/" ];
+  };
+  inherit sysroot;
 }

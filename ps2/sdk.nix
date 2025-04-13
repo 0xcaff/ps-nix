@@ -15,68 +15,71 @@ flake-utils.lib.eachSystem supported-systems (
   system:
   let
     pkgs = import nixpkgs { inherit system; };
-    ee-toolchain = (import ./ee.nix { inherit pkgs; });
+    ee = (import ./ee.nix { inherit pkgs; });
+    dvp = (import ./dvp.nix { inherit pkgs; });
+    iop = (import ./iop.nix { inherit pkgs; });
+    ps2sdk =
+      let
+        lwip = pkgs.fetchFromGitHub {
+          owner = "ps2dev";
+          repo = "lwip";
+          rev = "5255e70174b26fdb43eb488f381be4ca434dedcb";
+          sha256 = "sha256-W2Q26j1jObDBEv5e6B105FNpupXXXmoWe7TqW+3SiNU=";
+        };
+
+        fatfs = pkgs.fetchFromGitHub {
+          owner = "fjtrujy";
+          repo = "FatFs";
+          rev = "03ec5c06cc1434a373ed19e4fadd5aeb8dab78d9";
+          sha256 = "sha256-9fC8hS0O+5Ik0TFHYZNcoQ0zUBi/XwuPlDR4F7H5tXY=";
+        };
+      in
+      pkgs.stdenvNoCC.mkDerivation {
+        name = "ps2sdk";
+        version = "master";
+
+        src = pkgs.fetchFromGitHub {
+          owner = "ps2dev";
+          repo = "ps2sdk";
+          rev = "5bbcdb14896df0d384ed645d37d753c35ae9247e";
+          sha256 = "sha256-ew6yFB6iyYmk7NOeF8+9oIvqHguKh6zKJoDGwhusEs4=";
+        };
+
+        buildInputs = [
+          pkgs.gcc
+          pkgs.rsync
+
+          dvp
+          ee.toolchain
+          iop
+        ];
+
+        postUnpack = ''
+          rsync --chmod=ugo+w -r ${lwip}/ source/common/external_deps/lwip/
+          rsync --chmod=ugo+w -r ${fatfs}/ source/common/external_deps/fatfs/
+          install -m755 /dev/stdin source/download_dependencies.sh <<EOF
+          #!/bin/sh
+          exit 0
+          EOF
+        '';
+
+        preConfigure = ''
+          export EE_LDFLAGS="-L${ee.sysroot}/lib"
+
+          export PS2SDK=$out/ps2sdk
+          export PS2DEV=$out
+          mkdir -p $PS2DEV/iop/mipsel-none-elf/lib
+          mkdir -p $PS2DEV/ee/mips64r5900el-ps2-elf/lib
+        '';
+
+        patchPhase = ''
+          patchShebangs .
+        '';
+      };
   in
   {
     packages = flake-utils.lib.flattenTree {
-      ps2sdk =
-        let
-          lwip = pkgs.fetchFromGitHub {
-            owner = "ps2dev";
-            repo = "lwip";
-            rev = "5255e70174b26fdb43eb488f381be4ca434dedcb";
-            sha256 = "sha256-W2Q26j1jObDBEv5e6B105FNpupXXXmoWe7TqW+3SiNU=";
-          };
-
-          fatfs = pkgs.fetchFromGitHub {
-            owner = "fjtrujy";
-            repo = "FatFs";
-            rev = "03ec5c06cc1434a373ed19e4fadd5aeb8dab78d9";
-            sha256 = "sha256-9fC8hS0O+5Ik0TFHYZNcoQ0zUBi/XwuPlDR4F7H5tXY=";
-          };
-
-        in
-        pkgs.stdenvNoCC.mkDerivation {
-          name = "ps2sdk";
-          version = "master";
-
-          src = pkgs.fetchFromGitHub {
-            owner = "ps2dev";
-            repo = "ps2sdk";
-            rev = "5bbcdb14896df0d384ed645d37d753c35ae9247e";
-            sha256 = "sha256-ew6yFB6iyYmk7NOeF8+9oIvqHguKh6zKJoDGwhusEs4=";
-          };
-
-          buildInputs = [
-            pkgs.gcc
-            pkgs.rsync
-
-            self.packages.${system}.dvp-binutils
-            ee-toolchain
-            self.packages.${system}.iop-binutils
-            self.packages.${system}.iop-gcc
-          ];
-
-          postUnpack = ''
-            rsync --chmod=ugo+w -r ${lwip}/ source/common/external_deps/lwip/
-            rsync --chmod=ugo+w -r ${fatfs}/ source/common/external_deps/fatfs/
-            install -m755 /dev/stdin source/download_dependencies.sh <<EOF
-            #!/bin/sh
-            exit 0
-            EOF
-          '';
-
-          preConfigure = ''
-            export PS2SDK=$out/sdk
-            export PS2DEV=$out/dev
-            mkdir -p $out/dev/iop/mipsel-none-elf/lib
-            mkdir -p $out/dev/ee/mips64r5900el-ps2-elf/lib
-          '';
-
-          patchPhase = ''
-            patchShebangs .
-          '';
-        };
+      inherit ps2sdk;
     };
   }
 )
