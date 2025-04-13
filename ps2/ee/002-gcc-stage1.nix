@@ -45,48 +45,33 @@ flake-utils.lib.eachSystem supported-systems (
             --replace-fail '/usr/bin/file' '${pkgs.file}/bin/file'
         '';
 
-        setupHook = pkgs.writeText "setupHook.sh" ''
-          addToSearchPath PATH @out@/ee/bin
+        preConfigure = ''
+          export TARGET_CFLAGS="-O2 -gdwarf-2 -gz"
         '';
 
-        configurePhase = ''
-          mkdir build
-          cd build
+        configureFlags = [
+          "--with-as=${self.packages.${system}.ee-binutils}/bin/mips64r5900el-ps2-elf-as"
+          "--target=mips64r5900el-ps2-elf"
+          "--enable-languages=c"
+          "--with-float=hard"
+          "--without-headers"
+          "--without-newlib"
+          "--disable-libgcc"
+          "--disable-shared"
+          "--disable-threads"
+          "--disable-multilib"
+          "--disable-libatomic"
+          "--disable-nls"
+          "--disable-tls"
+          "--disable-libssp"
+          "--disable-libgomp"
+          "--disable-libmudflap"
+          "--disable-libquadmath"
+        ];
 
-          PS2DEV=$out
-          TARGET=mips64r5900el-ps2-elf
-          TARGET_ALIAS=ee
-
-          TARGET_CFLAGS="-O2 -gdwarf-2 -gz" \
-            ../configure \
-              --prefix="$PS2DEV/$TARGET_ALIAS" \
-              --target="$TARGET" \
-              --with-as=${self.packages.${system}.ee-binutils}/bin/mips64r5900el-ps2-elf-as \
-              --enable-languages="c" \
-              --with-float=hard \
-              --without-headers \
-              --without-newlib \
-              --disable-libgcc \
-              --disable-shared \
-              --disable-threads \
-              --disable-multilib \
-              --disable-libatomic \
-              --disable-nls \
-              --disable-tls \
-              --disable-libssp \
-              --disable-libgomp \
-              --disable-libmudflap \
-              --disable-libquadmath
-        '';
-
-        buildPhase = ''
-          make -j "$NIX_BUILD_CORES" all-gcc
-        '';
-
-        installPhase = ''
-          mkdir -p $out
-          make -j "$NIX_BUILD_CORES" install-gcc
-        '';
+        buildTargets = "all-gcc";
+        installTargets = "install-gcc";
+        enableParallelBuilding = true;
       };
     };
   }

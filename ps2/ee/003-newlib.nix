@@ -70,7 +70,7 @@ flake-utils.lib.eachSystem supported-systems (
                 name = "sysroot";
                 paths = [
                   "${self.packages.${system}.ee-binutils}"
-                  "${self.packages.${system}.ee-gcc-stage1}/ee"
+                  "${self.packages.${system}.ee-gcc-stage1}"
                 ];
               }
             } \
