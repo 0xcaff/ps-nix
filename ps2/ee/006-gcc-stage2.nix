@@ -66,6 +66,7 @@ flake-utils.lib.eachSystem supported-systems (
                 let
                   srcs = [
                     "${self.packages.${system}.newlib}/ee/mips64r5900el-ps2-elf"
+                    "${self.packages.${system}.newlib-nano}/ee/mips64r5900el-ps2-elf"
                     "${self.packages.${system}.binutils-gdb}/ee/mips64r5900el-ps2-elf"
                     "${self.packages.${system}.pthread-embedded}/ee/mips64r5900el-ps2-elf"
                   ];

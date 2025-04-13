@@ -58,14 +58,14 @@ flake-utils.lib.eachSystem supported-systems (
         preConfigure = ''
           export PATH=$PATH:${self.packages.${system}.iop-binutils-gdb}/iop/bin:${self.packages.${system}.iop-gcc}/iop/bin:${self.packages.${system}.dvp-binutils}/dvp/bin:${self.packages.${system}.gcc2}/ee/bin:${self.packages.${system}.binutils-gdb}/ee/bin
           export EE_CFLAGS="-isystem ${self.packages.${system}.newlib}/ee/mips64r5900el-ps2-elf/include"
-
+          export EE_LDFLAGS="-L${self.packages.${system}.newlib-nano}/ee/mips64r5900el-ps2-elf/lib -L${self.packages.${system}.newlib}/ee/mips64r5900el-ps2-elf/lib"
+          PS2SDK=$out
+          mkdir -p $out
         '';
 
         patchPhase = ''
           patchShebangs .
         '';
-
-
       };
     };
   }
