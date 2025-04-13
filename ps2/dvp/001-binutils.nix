@@ -29,18 +29,6 @@ flake-utils.lib.eachSystem supported-systems (
           sha256 = "sha256-gKldknLyP22v+b5nynrJwY0THj84dQD39/b4THhoayI=";
         };
 
-        setupHook = pkgs.writeText "setupHook.sh" ''
-          addToSearchPath PATH @out@/dvp/bin
-        '';
-
-        phases = [
-          "unpackPhase"
-          "patchPhase"
-          "configurePhase"
-          "buildPhase"
-          "installPhase"
-        ];
-
         buildInputs = [
           pkgs.gmp
           pkgs.mpfr
@@ -57,30 +45,14 @@ flake-utils.lib.eachSystem supported-systems (
             --replace-fail '/usr/bin/file' '${pkgs.file}/bin/file'
         '';
 
-        configurePhase = ''
-          mkdir build
-          cd build
+        configureFlags = [
+            "--target=dvp"
+            "--disable-nls"
+            "--disable-build-warnings"
+        ];
 
-          PS2DEV=$out
-          TARGET=dvp
-          TARGET_ALIAS=dvp
-
-          ../configure \
-            --quiet \
-            --prefix="$PS2DEV/$TARGET_ALIAS" \
-            --target="$TARGET" \
-            --disable-nls \
-            --disable-build-warnings
-        '';
-
-        buildPhase = ''
-          make -j $NIX_BUILD_CORES
-        '';
-
-        installPhase = ''
-          mkdir -p $out
-          make -j $NIX_BUILD_CORES install
-        '';
+        dontUpdateAutotoolsGnuConfigScripts = true;
+        enableParallelBuilding = true;
       };
     };
   }

@@ -29,10 +29,6 @@ flake-utils.lib.eachSystem supported-systems (
           sha256 = "sha256-g0YihbgEW1SsGbgi8r1iKqUj8sJmJE2Y3gVvm+98bAc=";
         };
 
-        setupHook = pkgs.writeText "setupHook.sh" ''
-          addToSearchPath PATH @out@/ee/bin
-        '';
-
         buildInputs = [
           pkgs.gmp
           pkgs.mpfr
@@ -49,32 +45,16 @@ flake-utils.lib.eachSystem supported-systems (
             --replace-fail '/usr/bin/file' '${pkgs.file}/bin/file'
         '';
 
-        configurePhase = ''
-          mkdir build
-          cd build
+        configureFlags = [
+          "--target=mips64r5900el-ps2-elf"
+          "--disable-separate-code"
+          "--disable-sim"
+          "--disable-nls"
+          "--with-python=no"
+        ];
 
-          PS2DEV=$out
-          TARGET_ALIAS=ee
-          TARGET=mips64r5900el-ps2-elf
-
-          ../configure \
-            --prefix="$PS2DEV/$TARGET_ALIAS" \
-            --target="$TARGET" \
-            --with-sysroot="$PS2DEV/$TARGET_ALIAS/$TARGET" \
-            --disable-separate-code \
-            --disable-sim \
-            --disable-nls \
-            --with-python=no
-        '';
-
-        buildPhase = ''
-          make -j $NIX_BUILD_CORES
-        '';
-
-        installPhase = ''
-          mkdir -p $out
-          make -j $NIX_BUILD_CORES install-strip
-        '';
+        installTargets = "install-strip";
+        enableParallelBuilding = true;
       };
     };
   }

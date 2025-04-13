@@ -64,14 +64,14 @@ flake-utils.lib.eachSystem supported-systems (
               --target="$TARGET" \
               --enable-languages="c,c++" \
               --with-float=hard \
-              --with-as=${self.packages.${system}.ee-binutils}/ee/bin/mips64r5900el-ps2-elf-as \
-              --with-ld=${self.packages.${system}.ee-binutils}/ee/bin/mips64r5900el-ps2-elf-ld \
+              --with-as=${self.packages.${system}.ee-binutils}/bin/mips64r5900el-ps2-elf-as \
+              --with-ld=${self.packages.${system}.ee-binutils}/bin/mips64r5900el-ps2-elf-ld \
               --with-sysroot=${
                 let
                   srcs = [
                     "${self.packages.${system}.newlib}/ee/mips64r5900el-ps2-elf"
                     "${self.packages.${system}.newlib-nano}/ee/mips64r5900el-ps2-elf"
-                    "${self.packages.${system}.ee-binutils}/ee/mips64r5900el-ps2-elf"
+                    "${self.packages.${system}.ee-binutils}/mips64r5900el-ps2-elf"
                     "${self.packages.${system}.pthread-embedded}/ee/mips64r5900el-ps2-elf"
                   ];
                 in

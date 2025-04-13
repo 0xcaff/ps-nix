@@ -69,7 +69,7 @@ flake-utils.lib.eachSystem supported-systems (
               pkgs.symlinkJoin {
                 name = "sysroot";
                 paths = [
-                  "${self.packages.${system}.ee-binutils}/ee"
+                  "${self.packages.${system}.ee-binutils}"
                   "${self.packages.${system}.ee-gcc-stage1}/ee"
                 ];
               }

@@ -61,7 +61,7 @@ flake-utils.lib.eachSystem supported-systems (
             ../configure \
               --prefix="$PS2DEV/$TARGET_ALIAS" \
               --target="$TARGET" \
-              --with-as=${self.packages.${system}.ee-binutils}/ee/bin/mips64r5900el-ps2-elf-as \
+              --with-as=${self.packages.${system}.ee-binutils}/bin/mips64r5900el-ps2-elf-as \
               --enable-languages="c" \
               --with-float=hard \
               --without-headers \
