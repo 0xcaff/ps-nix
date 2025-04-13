@@ -51,7 +51,6 @@ flake-utils.lib.eachSystem supported-systems (
             pkgs.rsync
 
             self.packages.${system}.dvp-binutils
-            self.packages.${system}.ee-gcc-stage1
             self.packages.${system}.ee-gcc-stage2
             self.packages.${system}.ee-binutils
             self.packages.${system}.iop-binutils
@@ -68,7 +67,6 @@ flake-utils.lib.eachSystem supported-systems (
           '';
 
           preConfigure = ''
-            export EE_CFLAGS="-isystem ${self.packages.${system}.newlib}/mips64r5900el-ps2-elf/include -isystem ${self.packages.${system}.pthread-embedded}/ee/mips64r5900el-ps2-elf/include"
             export EE_LDFLAGS="-L${
               self.packages.${system}.newlib-nano
             }/mips64r5900el-ps2-elf/lib -L${self.packages.${system}.newlib}/mips64r5900el-ps2-elf/lib -L${self.packages.${system}.ee-gcc-stage2}/lib/gcc/mips64r5900el-ps2-elf/14.2.0"
