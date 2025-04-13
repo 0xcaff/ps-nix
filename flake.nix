@@ -1,4 +1,10 @@
 {
+  nixConfig = {
+    extra-substituters = [
+      "https://ps-nix.cache.0xcaff.xyz"
+    ];
+  };
+
   description = "a collection of tools for ps homebrew development";
 
   inputs = {
