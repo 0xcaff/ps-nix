@@ -13,5 +13,5 @@ jobs:
       - uses: DeterminateSystems/nix-installer-action@main
       - run: nix copy .#packages.x86_64-linux.ps2dev --to "s3://ps-nix-cache?endpoint=${{ vars.S3_ENDPOINT }}&compression=zstd"
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_ACCESS_KEY_ID: ${{ vars.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
