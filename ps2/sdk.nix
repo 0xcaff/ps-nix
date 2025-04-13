@@ -15,6 +15,7 @@ flake-utils.lib.eachSystem supported-systems (
   system:
   let
     pkgs = import nixpkgs { inherit system; };
+    ee-toolchain = (import ./ee.nix { inherit pkgs; });
   in
   {
     packages = flake-utils.lib.flattenTree {
@@ -51,8 +52,7 @@ flake-utils.lib.eachSystem supported-systems (
             pkgs.rsync
 
             self.packages.${system}.dvp-binutils
-            self.packages.${system}.ee-gcc-stage2
-            self.packages.${system}.ee-binutils
+            ee-toolchain
             self.packages.${system}.iop-binutils
             self.packages.${system}.iop-gcc
           ];
@@ -67,9 +67,6 @@ flake-utils.lib.eachSystem supported-systems (
           '';
 
           preConfigure = ''
-            export EE_LDFLAGS="-L${
-              self.packages.${system}.newlib-nano
-            }/mips64r5900el-ps2-elf/lib -L${self.packages.${system}.newlib}/mips64r5900el-ps2-elf/lib -L${self.packages.${system}.ee-gcc-stage2}/lib/gcc/mips64r5900el-ps2-elf/14.2.0"
             export PS2SDK=$out/sdk
             export PS2DEV=$out/dev
             mkdir -p $out/dev/iop/mipsel-none-elf/lib
