@@ -5,6 +5,13 @@ a collection of unofficial Playstation toolchains packaged in nix. Currently inc
 * https://github.com/OpenOrbis/OpenOrbis-PS4-Toolchain
 * https://github.com/ps2dev/ps2dev
 
+## getting started
+
+```
+nix develop github:0xcaff/ps-nix#ps2
+NIXPKGS_ALLOW_INSECURE=1 nix develop --impure github:0xcaff/ps-nix#ps4
+```
+
 ## why nix
 
 these toolchains are both fragile and complex. building from source breaks with
@@ -19,10 +26,3 @@ or at least the next 10 years.
 
 i haven't really tried using these toolchains deeply yet. they're pinned to tip
 of main versions. they probably only work on x86_64-linux (maybe arm linux too).
-
-## getting started
-
-```
-nix shell github:0xcaff/ps-nix#ps4
-nix shell github:0xcaff/ps-nix#ps2
-```
