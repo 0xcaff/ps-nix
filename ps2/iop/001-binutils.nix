@@ -29,10 +29,6 @@ flake-utils.lib.eachSystem supported-systems (
           sha256 = "sha256-2tzItSMVmAb8jcTKODRztXFY40DcL8KItBq0qTjb/tA=";
         };
 
-        setupHook = pkgs.writeText "setupHook.sh" ''
-          addToSearchPath PATH @out@/iop/bin
-        '';
-
         buildInputs = [
           pkgs.gmp
           pkgs.mpfr
@@ -50,32 +46,17 @@ flake-utils.lib.eachSystem supported-systems (
             --replace-fail '/usr/bin/file' '${pkgs.file}/bin/file'
         '';
 
-        configurePhase = ''
-          mkdir build
-          cd build
+        configureFlags = [
+          "--quiet"
+          "--target=mipsel-none-elf"
+          "--disable-separate-code"
+          "--disable-sim"
+          "--disable-nls"
+          "--with-python=no"
+        ];
 
-          TARGET="mipsel-none-elf"
-          TARGET_ALIAS="iop"
-          PS2DEV=$out
-
-          ../configure \
-            --quiet \
-            --prefix="$PS2DEV/$TARGET_ALIAS" \
-            --target="$TARGET" \
-            --disable-separate-code \
-            --disable-sim \
-            --disable-nls \
-            --with-python=no
-        '';
-
-        buildPhase = ''
-          make -j $NIX_BUILD_CORES
-        '';
-
-        installPhase = ''
-          mkdir -p $out
-          make -j $NIX_BUILD_CORES install-strip
-        '';
+        installTargets = "install-strip";
+        enableParallelBuilding = true;
       };
     };
   }

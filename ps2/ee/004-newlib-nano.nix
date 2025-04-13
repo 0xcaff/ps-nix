@@ -43,10 +43,7 @@ flake-utils.lib.eachSystem supported-systems (
           patchShebangs .
         '';
 
-        configurePhase = ''
-          mkdir build
-          cd build
-
+        preConfigure = ''
           echo "Unsetting *_FOR_TARGET env vars not matching FLAGS and not starting with NIX..."
           while IFS='=' read -r name _; do
             if [[ "$name" == *_FOR_TARGET ]] && [[ "$name" != *FLAGS* ]] && [[ "$name" != NIX* ]]; then
@@ -54,53 +51,47 @@ flake-utils.lib.eachSystem supported-systems (
               echo "unset $name"
             fi
           done < <(env)
-
-          printenv
-
-          PS2DEV=$out
-          TARGET_ALIAS=ee
-          TARGET=mips64r5900el-ps2-elf
           export CFLAGS_FOR_TARGET="-O2 -gdwarf-2 -gz"
-
-          ../configure \
-            --prefix="$PS2DEV/$TARGET_ALIAS" \
-            --target="$TARGET" \
-            --with-sysroot=${
-              pkgs.symlinkJoin {
-                name = "sysroot";
-                paths = [
-                  "${self.packages.${system}.ee-binutils}"
-                  "${self.packages.${system}.ee-gcc-stage1}"
-                ];
-              }
-            } \
-            --disable-newlib-supplied-syscalls \
-            --enable-newlib-reent-small \
-            --disable-newlib-fvwrite-in-streamio \
-            --disable-newlib-fseek-optimization \
-            --disable-newlib-wide-orient \
-            --enable-newlib-nano-malloc \
-            --disable-newlib-unbuf-stream-opt \
-            --enable-lite-exit \
-            --enable-newlib-global-atexit \
-            --enable-newlib-nano-formatted-io \
-            --enable-newlib-retargetable-locking \
-            --enable-newlib-multithread \
-            --disable-nls
+          printenv
         '';
 
-        buildPhase = ''
-          make --trace -j $NIX_BUILD_CORES all
+        configureFlags = [
+          "--target=mips64r5900el-ps2-elf"
+          "--with-sysroot=${
+            pkgs.symlinkJoin {
+              name = "sysroot";
+              paths = [
+                "${self.packages.${system}.ee-binutils}"
+                "${self.packages.${system}.ee-gcc-stage1}"
+              ];
+            }
+          }"
+          "--disable-newlib-supplied-syscalls"
+          "--enable-newlib-reent-small"
+          "--disable-newlib-fvwrite-in-streamio"
+          "--disable-newlib-fseek-optimization"
+          "--disable-newlib-wide-orient"
+          "--enable-newlib-nano-malloc"
+          "--disable-newlib-unbuf-stream-opt"
+          "--enable-lite-exit"
+          "--enable-newlib-global-atexit"
+          "--enable-newlib-nano-formatted-io"
+          "--enable-newlib-retargetable-locking"
+          "--enable-newlib-multithread"
+          "--disable-nls"
+        ];
+
+        buildTargets = "all";
+        installTargets = "install-strip";
+
+        postInstall = ''
+          mv $out/mips64r5900el-ps2-elf/lib/libc{,_nano}.a
+          mv $out/mips64r5900el-ps2-elf/lib/libg{,_nano}.a
+          mv $out/mips64r5900el-ps2-elf/lib/libm{,_nano}.a
         '';
 
-        installPhase = ''
-          mkdir -p $out
-          make -j $NIX_BUILD_CORES install-strip
-
-          mv "$out/$TARGET_ALIAS/$TARGET/lib/libc.a" "$PS2DEV/$TARGET_ALIAS/$TARGET/lib/libc_nano.a"
-          mv "$out/$TARGET_ALIAS/$TARGET/lib/libg.a" "$PS2DEV/$TARGET_ALIAS/$TARGET/lib/libg_nano.a"
-          mv "$out/$TARGET_ALIAS/$TARGET/lib/libm.a" "$PS2DEV/$TARGET_ALIAS/$TARGET/lib/libm_nano.a"
-        '';
+        dontFixup = true;
+        enableParallelBuilding = true;
       };
     };
   }

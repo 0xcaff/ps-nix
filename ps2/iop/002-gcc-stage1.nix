@@ -19,7 +19,7 @@ flake-utils.lib.eachSystem supported-systems (
   {
     packages = flake-utils.lib.flattenTree {
       iop-gcc = pkgs.stdenvNoCC.mkDerivation {
-        name = "gcc";
+        name = "iop-gcc";
         version = "14.2.0";
 
         src = pkgs.fetchFromGitHub {
@@ -46,53 +46,56 @@ flake-utils.lib.eachSystem supported-systems (
             --replace-fail '/usr/bin/file' '${pkgs.file}/bin/file'
         '';
 
+        preConfigurePhase = ''
+          export TARGET_CFLAGS="-O2 -gdwarf-2 -gz"
+        '';
+
+        configureFlags = [
+          "--target=mipsel-none-elf"
+          "--with-as=${self.packages.${system}.iop-binutils}/bin/mipsel-none-elf-as"
+          "--enable-languages=c,c++"
+          "--with-float=soft"
+          "--with-headers=no"
+          "--without-newlib"
+          "--without-cloog"
+          "--without-ppl"
+          "--disable-decimal-float"
+          "--disable-libada"
+          "--disable-libatomic"
+          "--disable-libffi"
+          "--disable-libgomp"
+          "--disable-libmudflap"
+          "--disable-libquadmath"
+          "--disable-libssp"
+          "--disable-libstdcxx-pch"
+          "--disable-multilib"
+          "--disable-shared"
+          "--disable-threads"
+          "--disable-target-libiberty"
+          "--disable-target-zlib"
+          "--disable-nls"
+          "--disable-tls"
+          "--disable-libstdcxx"
+        ];
+
         configurePhase = ''
           mkdir build
           cd build
 
-          PS2DEV=$out
-          TARGET=mipsel-none-elf
-          TARGET_ALIAS=iop
+          prependToVar configureFlags "''${prefixKey:---prefix=}$prefix"
 
-          TARGET_CFLAGS="-O2 -gdwarf-2 -gz" \
-            ../configure \
-              --quiet \
-              --with-as=${self.packages.${system}.iop-binutils}/iop/bin/mipsel-none-elf-as \
-              --prefix="$PS2DEV/$TARGET_ALIAS" \
-              --target="$TARGET" \
-              --enable-languages="c,c++" \
-              --with-float=soft \
-              --with-headers=no \
-              --without-newlib \
-              --without-cloog \
-              --without-ppl \
-              --disable-decimal-float \
-              --disable-libada \
-              --disable-libatomic \
-              --disable-libffi \
-              --disable-libgomp \
-              --disable-libmudflap \
-              --disable-libquadmath \
-              --disable-libssp \
-              --disable-libstdcxx-pch \
-              --disable-multilib \
-              --disable-shared \
-              --disable-threads \
-              --disable-target-libiberty \
-              --disable-target-zlib \
-              --disable-nls \
-              --disable-tls \
-              --disable-libstdcxx
+          local -a flagsArray
+          concatTo flagsArray configureFlags configureFlagsArray
+
+          echoCmd 'configure flags' "''${flagsArray[@]}"
+          ../configure "''${flagsArray[@]}"
+          unset flagsArray
         '';
 
-        buildPhase = ''
-          make -j "$NIX_BUILD_CORES" all
-        '';
+        buildTargets = "all";
+        installTargets = "install-strip";
+        enableParallelBuilding = true;
 
-        installPhase = ''
-          mkdir -p $out
-          make -j "$NIX_BUILD_CORES" install-strip
-        '';
       };
     };
   }

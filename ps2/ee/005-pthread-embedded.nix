@@ -37,8 +37,10 @@ flake-utils.lib.eachSystem supported-systems (
         preBuild = ''
           export PS2DEV=$out
           cd platform/ps2
-          export GLOBAL_CFLAGS="-isystem ${self.packages.${system}.newlib}/ee/mips64r5900el-ps2-elf/include"
+          export GLOBAL_CFLAGS="-isystem ${self.packages.${system}.newlib}/mips64r5900el-ps2-elf/include"
         '';
+
+        dontFixup = true;
       };
     };
   }
