@@ -23,6 +23,8 @@ jobs:
         with:
           extra-conf: secret-key-files = /etc/nix/key.sec
 
+      - run: nix show-config
+
       - run: nix copy .#packages.x86_64-linux.ps2dev --to "s3://ps-nix-cache?endpoint=${{ vars.S3_ENDPOINT }}&compression=zstd"
         env:
           AWS_ACCESS_KEY_ID: ${{ vars.AWS_ACCESS_KEY_ID }}
