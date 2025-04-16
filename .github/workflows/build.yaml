@@ -13,9 +13,9 @@ jobs:
 
       - name: install signing key
         run: |
-          mkdir -p /etc/nix
-          echo "$NIX_SIGNING_KEY" > /etc/nix/key.sec
-          chmod 0600 /etc/nix/key.sec
+          sudo mkdir -p /etc/nix
+          echo "$NIX_SIGNING_KEY" | sudo tee /etc/nix/key.sec > /dev/null
+          sudo chmod 0600 /etc/nix/key.sec
         env:
           NIX_SIGNING_KEY: ${{ secrets.NIX_SIGNING_KEY }}
 
