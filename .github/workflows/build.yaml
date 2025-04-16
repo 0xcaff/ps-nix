@@ -18,7 +18,6 @@ jobs:
           chmod 0600 /etc/nix/key.sec
         env:
           NIX_SIGNING_KEY: ${{ secrets.NIX_SIGNING_KEY }}
-        shell: sudo bash
 
       - uses: DeterminateSystems/nix-installer-action@main
         with:
