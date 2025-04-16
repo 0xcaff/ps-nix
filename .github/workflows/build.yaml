@@ -10,7 +10,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: install signing key
+        run: |
+          mkdir -p /etc/nix
+          echo "$NIX_SIGNING_KEY" > /etc/nix/key.sec
+          chmod 0600 /etc/nix/key.sec
+        env:
+          NIX_SIGNING_KEY: ${{ secrets.NIX_SIGNING_KEY }}
+        shell: sudo bash
+
       - uses: DeterminateSystems/nix-installer-action@main
+        with:
+          extra-conf: secret-key-files = /etc/nix/key.sec
+
       - run: nix copy .#packages.x86_64-linux.ps2dev --to "s3://ps-nix-cache?endpoint=${{ vars.S3_ENDPOINT }}&compression=zstd"
         env:
           AWS_ACCESS_KEY_ID: ${{ vars.AWS_ACCESS_KEY_ID }}
