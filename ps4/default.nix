@@ -6,5 +6,6 @@ flake-utils.lib.meld inputs [
   ./create-gp4.nix
   ./readoelf.nix
   ./toolchain.nix
+  ./goldhen-sdk.nix
   ./shell.nix
 ]
