@@ -87,7 +87,7 @@ flake-utils.lib.eachSystem supported-systems (
   in
   {
     packages = flake-utils.lib.flattenTree {
-      ps2dev = pkgs.runCommand "ps2dev" {} ''
+      ps2dev = pkgs.runCommand "ps2dev" { } ''
         mkdir -p $out
         ln -s ${dvp} $out/dvp
         ln -s ${iop} $out/iop

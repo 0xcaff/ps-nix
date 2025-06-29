@@ -28,7 +28,10 @@ flake-utils.lib.eachSystem supported-systems (
 
       nativeBuildInputs = with pkgs; [ gnumake ];
 
-      buildInputs = [ self.packages.${system}.toolchain pkgs.clang ];
+      buildInputs = [
+        self.packages.${system}.toolchain
+        pkgs.clang
+      ];
 
       patches = [ ./goldhen-sdk.patch ];
 
@@ -41,6 +44,11 @@ flake-utils.lib.eachSystem supported-systems (
       installPhase = ''
         mkdir -p $out
         cp -r * $out/
+
+        mkdir -p $out/nix-support
+        cat > $out/nix-support/setup-hook <<EOF
+        export GOLDHEN_SDK=$out
+        EOF
       '';
     };
   }

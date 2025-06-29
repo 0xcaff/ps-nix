@@ -279,6 +279,11 @@ flake-utils.lib.eachSystem supported-systems (
         rm $out/lib/libc.a
         mv $out/lib/{libcM.a,libc.a}
         mv link.x $out/
+
+        mkdir -p $out/nix-support
+        cat > $out/nix-support/setup-hook <<EOF
+        export OO_PS4_TOOLCHAIN=$out
+        EOF
       '';
     };
   }

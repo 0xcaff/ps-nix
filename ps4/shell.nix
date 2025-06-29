@@ -16,10 +16,10 @@ flake-utils.lib.eachSystem supported-systems (
   in
   {
     devShells.ps4 = pkgs.mkShell {
-      shellHook = ''
-        export OO_PS4_TOOLCHAIN=${self.packages.${system}.toolchain}
-        export GOLDHEN_SDK=${self.packages.${system}.goldhen-sdk}
-      '';
+      packages = [
+        self.packages.${system}.toolchain
+        self.packages.${system}.goldhen-sdk
+      ];
     };
   }
 )
