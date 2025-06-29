@@ -36,8 +36,7 @@ flake-utils.lib.eachSystem supported-systems (
       patches = [ ./goldhen-sdk.patch ];
 
       buildPhase = ''
-        OO_PS4_TOOLCHAIN=${self.packages.${system}.toolchain} make
-        rm -rf build
+        make
         rm -f Makefile.orig
       '';
 
