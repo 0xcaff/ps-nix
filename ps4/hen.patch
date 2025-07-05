@@ -1,0 +1,81 @@
+Index: build.sh
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/build.sh b/build.sh
+--- a/build.sh	(revision 106f676ffb881fee6b249da386f64274134fa36a)
++++ b/build.sh	(date 1751735948456)
+@@ -1,52 +1,21 @@
+ #!/bin/bash
+ set -e
+
+-# Only update/install if running as root AND on Ubuntu
+-# This is for the CI
+-# On your system you shouldn't be running as root and should already have these installed
+-if [ "$(id -u)" -eq 0 ] && grep -qi ubuntu /etc/os-release; then
+-  apt-get update
+-  apt-get install -y --no-install-recommends ca-certificates curl unzip xxd
+-fi
+-
+ cd kpayload
+ make clean
+ make
+ cd ..
+
+-mkdir -p tmp
+-cd tmp
+-
+-# known bundled plugins
+-PRX_FILES="plugin_bootloader.prx plugin_loader.prx plugin_server.prx"
+-
+-SKIP_DOWNLOAD=false
+-if [ -f plugins.zip ]; then
+-  SKIP_DOWNLOAD=true
+-else
+-  for prx in "${PRX_FILES[@]}"; do
+-    if [ -f "$prx" ]; then
+-      SKIP_DOWNLOAD=true
+-      break
+-    fi
+-  done
+-fi
+-
+-if [ "$SKIP_DOWNLOAD" = false ]; then
+-  f="plugins.zip"
+-  rm -f $f
+-  curl -fLJO https://github.com/Scene-Collective/ps4-hen-plugins/releases/latest/download/$f
+-  unzip $f
+-fi
++pushd @pluginsPath@
+
+ # need to use translation units to force rebuilds
+ # including as headers doesn't do it
+ for file in *.prx; do
+   echo $file
+-  xxd -i "$file" | sed 's/^unsigned /static const unsigned /' > "../installer/source/${file}.inc.c"
++  xxd -i "$file" | sed 's/^unsigned /static const unsigned /' > "/build/source/installer/source/${file}.inc.c"
+ done
+
+-cd ..
++popd
+
+ cd installer
+ make clean
+Index: kpayload/Makefile
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/kpayload/Makefile b/kpayload/Makefile
+--- a/kpayload/Makefile	(revision 106f676ffb881fee6b249da386f64274134fa36a)
++++ b/kpayload/Makefile	(date 1751698034717)
+@@ -12,7 +12,7 @@
+ STANDARDS    := -std=gnu11 -fno-builtin -nostartfiles -nostdlib
+ WARNINGS     := -Wall # -Wextra # -Werror
+ ARCH_FLAGS   := -masm=intel -march=btver2 -mtune=btver2 -m64 -mabi=sysv -mcmodel=small -fpie
+-CFLAGS       := -I$(IDIR) $(OPTIMIZATION) $(STANDARDS) $(WARNINGS) $(ARCH_FLAGS)
++CFLAGS       := -I$(IDIR) $(OPTIMIZATION) $(STANDARDS) $(WARNINGS) $(ARCH_FLAGS) -fno-stack-protector
+
+ # Linker flags
+ LFLAGS	:= -Xlinker -T ./linker.x -Xlinker -Map=$(MAPFILE) -Wl,--build-id=none

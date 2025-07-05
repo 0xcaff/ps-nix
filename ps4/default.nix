@@ -9,4 +9,5 @@ flake-utils.lib.meld inputs [
   ./goldhen-sdk.nix
   ./shell.nix
   ./payload-sdk.nix
+  ./hen.nix
 ]
