@@ -25,7 +25,8 @@ jobs:
 
       - run: nix show-config
 
-      - run: nix copy .#packages.x86_64-linux.{ps2dev,toolchain,goldhen-sdk} --to "s3://ps-nix-cache?endpoint=${{ vars.S3_ENDPOINT }}&compression=zstd"
+      - run: nix copy --impure .#packages.x86_64-linux.{ps2dev,toolchain,goldhen-sdk} --to "s3://ps-nix-cache?endpoint=${{ vars.S3_ENDPOINT }}&compression=zstd"
         env:
+          NIXPKGS_ALLOW_INSECURE: 1
           AWS_ACCESS_KEY_ID: ${{ vars.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
