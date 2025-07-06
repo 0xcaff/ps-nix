@@ -23,7 +23,7 @@ flake-utils.lib.eachSystem supported-systems (
     };
   in
   {
-    packages.pppwn = pkgs.stdenv.mkDerivation {
+    packages.pppwn = pkgs.stdenvNoCC.mkDerivation {
       pname = "pppwn";
       inherit version;
 
@@ -38,6 +38,11 @@ flake-utils.lib.eachSystem supported-systems (
         substituteInPlace **/Makefile \
           --replace-fail '../freebsd-headers' '${freebsd_headers}'
       '';
+
+      buildInputs = [
+        pkgs.gcc-unwrapped
+        pkgs.bintools-unwrapped
+      ];
 
       FW = "1100";
 
