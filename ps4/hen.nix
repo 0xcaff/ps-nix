@@ -16,7 +16,7 @@ flake-utils.lib.eachSystem supported-systems (
     localPkgs = self.packages.${pkgs.system};
   in
   {
-    packages.ps4-libjbc = pkgs.stdenv.mkDerivation {
+    packages.ps4-libjbc = pkgs.stdenvNoCC.mkDerivation {
       pname = "ps4-libjbc";
       version = "d3fb28fce137c5ca0453428ed5c5476bf4cf4d14";
 
@@ -28,7 +28,7 @@ flake-utils.lib.eachSystem supported-systems (
       };
 
       buildInputs = [
-        pkgs.clang
+        pkgs.llvmPackages.clang-unwrapped
         pkgs.llvmPackages.bintools-unwrapped
         localPkgs.toolchain
       ];
@@ -40,7 +40,6 @@ flake-utils.lib.eachSystem supported-systems (
         mkdir -p $out/{include,lib}
       '';
 
-      hardeningDisable = [ "all" ];
       dontFixup = true;
     };
 
@@ -48,7 +47,7 @@ flake-utils.lib.eachSystem supported-systems (
       let
         version = "307747750ae468968da8432f3a7b18f4325c484e";
       in
-      pkgs.stdenv.mkDerivation {
+      pkgs.stdenvNoCC.mkDerivation {
         pname = "ps4-hen-plugins";
         version = version;
 
@@ -98,13 +97,15 @@ flake-utils.lib.eachSystem supported-systems (
         dontFixup = true;
       };
 
-    packages.ps4-hen = pkgs.stdenv.mkDerivation {
+    packages.ps4-hen = pkgs.stdenvNoCC.mkDerivation {
       pname = "ps4-hen";
       version = "106f676ffb881fee6b249da386f64274134fa36a";
 
       buildInputs = [
         pkgs.xxd
         localPkgs.ps4-payload-sdk
+        pkgs.gcc-unwrapped
+        pkgs.bintools-unwrapped
       ];
 
       src = pkgs.fetchFromGitHub {
@@ -131,7 +132,6 @@ flake-utils.lib.eachSystem supported-systems (
         cp hen.bin $out
       '';
 
-      hardeningDisable = [ "all" ];
       dontFixup = true;
     };
   }

@@ -15,7 +15,7 @@ flake-utils.lib.eachSystem supported-systems (
     pkgs = import nixpkgs { inherit system; };
   in
   {
-    packages.ps4-payload-sdk = pkgs.stdenv.mkDerivation {
+    packages.ps4-payload-sdk = pkgs.stdenvNoCC.mkDerivation {
       pname = "ps4-payload-sdk";
       version = "99113ef9ae38bdc76fa8e741dd70d9423417b0a1";
 
@@ -25,6 +25,11 @@ flake-utils.lib.eachSystem supported-systems (
         rev = "99113ef9ae38bdc76fa8e741dd70d9423417b0a1";
         sha256 = "sha256-y3vU3kOQomZ5ejXkZ6TzqLn/WdxD6eIJwXproCW3kH0=";
       };
+
+      buildInputs = [
+        pkgs.gcc-unwrapped
+        pkgs.binutils-unwrapped-all-targets
+      ];
 
       buildPhase = ''
         make -C ./libPS4
@@ -40,7 +45,6 @@ flake-utils.lib.eachSystem supported-systems (
         EOF
       '';
 
-      hardeningDisable = [ "all" ];
       dontFixup = true;
     };
   }
