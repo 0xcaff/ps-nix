@@ -1,0 +1,46 @@
+Index: CMakeLists.txt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt	(revision abb5159737c92602f7f6aa5b99255b4a36258f72)
++++ b/CMakeLists.txt	(date 1751778583484)
+@@ -66,9 +66,7 @@
+         set(DISABLE_DBUS ON)
+         set(DISABLE_RDMA ON)
+         set(BUILD_WITH_LIBNL OFF)
+-        FetchContent_Declare(pcap GIT_REPOSITORY https://github.com/the-tcpdump-group/libpcap.git
+-                GIT_TAG libpcap-1.10.4)
+-        FetchContent_MakeAvailable(pcap)
++        add_subdirectory(${pcap_SOURCE_DIR} ${CMAKE_BINARY_DIR}/vendor/pcap)
+         file(COPY ${pcap_SOURCE_DIR}/pcap DESTINATION ${CMAKE_BINARY_DIR}/vendor/include)
+         include_directories("${CMAKE_BINARY_DIR}/vendor/include")
+         set(PCAP_INCLUDE_DIR "${CMAKE_BINARY_DIR}/vendor/include/pcap")
+@@ -86,10 +84,7 @@
+     set(BUILD_SHARED_LIBS OFF)
+     set(PCAPPP_ENABLE_PCAP_SET_DIRECTION ${PPPWN_PCAP_DIRECTION})
+     set(PCAPPP_ENABLE_PCAP_IMMEDIATE_MODE ON)
+-    include(FetchContent)
+-    FetchContent_Declare(PcapPlusPlus GIT_REPOSITORY https://github.com/seladb/PcapPlusPlus.git
+-            GIT_TAG v23.09)
+-    FetchContent_MakeAvailable(PcapPlusPlus)
++    add_subdirectory(${PcapPlusPlus_SOURCE_DIR} ${CMAKE_BINARY_DIR}/vendor/PcapPlusPlus)
+     set_property(TARGET Packet++ PROPERTY COMPILE_WARNING_AS_ERROR OFF)
+     set_property(TARGET Pcap++ PROPERTY COMPILE_WARNING_AS_ERROR OFF)
+     set_property(TARGET Common++ PROPERTY COMPILE_WARNING_AS_ERROR OFF)
+@@ -115,14 +110,6 @@
+
+ if (BUILD_CLI)
+     include(FetchContent)
+-    FetchContent_Declare(clipp GIT_REPOSITORY https://github.com/muellan/clipp.git
+-            GIT_TAG v1.2.3)
+-    FetchContent_MakeAvailable(clipp)
+-
+-    FetchContent_Declare(mongoose GIT_REPOSITORY https://github.com/cesanta/mongoose.git
+-            GIT_TAG 7.14)
+-    FetchContent_MakeAvailable(mongoose)
+-
+     add_library(mongoose STATIC ${mongoose_SOURCE_DIR}/mongoose.c)
+     target_compile_options(mongoose PUBLIC -DMG_ENABLE_PACKED_FS=1)
+     target_include_directories(mongoose PUBLIC ${mongoose_SOURCE_DIR})
