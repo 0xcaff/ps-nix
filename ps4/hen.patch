@@ -62,20 +62,3 @@ diff --git a/build.sh b/build.sh
 
  cd installer
  make clean
-Index: kpayload/Makefile
-IDEA additional info:
-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
-<+>UTF-8
-===================================================================
-diff --git a/kpayload/Makefile b/kpayload/Makefile
---- a/kpayload/Makefile	(revision 106f676ffb881fee6b249da386f64274134fa36a)
-+++ b/kpayload/Makefile	(date 1751698034717)
-@@ -12,7 +12,7 @@
- STANDARDS    := -std=gnu11 -fno-builtin -nostartfiles -nostdlib
- WARNINGS     := -Wall # -Wextra # -Werror
- ARCH_FLAGS   := -masm=intel -march=btver2 -mtune=btver2 -m64 -mabi=sysv -mcmodel=small -fpie
--CFLAGS       := -I$(IDIR) $(OPTIMIZATION) $(STANDARDS) $(WARNINGS) $(ARCH_FLAGS)
-+CFLAGS       := -I$(IDIR) $(OPTIMIZATION) $(STANDARDS) $(WARNINGS) $(ARCH_FLAGS) -fno-stack-protector
-
- # Linker flags
- LFLAGS	:= -Xlinker -T ./linker.x -Xlinker -Map=$(MAPFILE) -Wl,--build-id=none

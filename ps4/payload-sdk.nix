@@ -39,6 +39,9 @@ flake-utils.lib.eachSystem supported-systems (
         export PS4SDK=$out
         EOF
       '';
+
+      hardeningDisable = [ "all" ];
+      dontFixup = true;
     };
   }
 )

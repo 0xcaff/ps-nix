@@ -39,6 +39,9 @@ flake-utils.lib.eachSystem supported-systems (
 
         mkdir -p $out/{include,lib}
       '';
+
+      hardeningDisable = [ "all" ];
+      dontFixup = true;
     };
 
     packages.ps4-hen-plugins =
@@ -90,6 +93,9 @@ flake-utils.lib.eachSystem supported-systems (
         installPhase = ''
           cp -r bin/plugins/prx $out
         '';
+
+        hardeningDisable = [ "all" ];
+        dontFixup = true;
       };
 
     packages.ps4-hen = pkgs.stdenv.mkDerivation {
@@ -124,6 +130,9 @@ flake-utils.lib.eachSystem supported-systems (
         mkdir -p $out
         cp hen.bin $out
       '';
+
+      hardeningDisable = [ "all" ];
+      dontFixup = true;
     };
   }
 )
