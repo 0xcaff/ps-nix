@@ -11,4 +11,5 @@ flake-utils.lib.meld inputs [
   ./payload-sdk.nix
   ./hen.nix
   ./pppwn_cpp.nix
+  ./pppwn.nix
 ]
