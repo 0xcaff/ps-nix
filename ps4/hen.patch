@@ -4,9 +4,9 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
 ===================================================================
 diff --git a/build.sh b/build.sh
---- a/build.sh	(revision 0acd34983a6417423382aaf807f09c530f06f198)
-+++ b/build.sh	(date 1751772854733)
-@@ -1,51 +1,18 @@
+--- a/build.sh	(revision 83a8c04274d8b19041026349f19558b1683de114)
++++ b/build.sh	(date 1751950062175)
+@@ -1,57 +1,22 @@
  #!/bin/bash
  set -e
 
@@ -19,6 +19,7 @@ diff --git a/build.sh b/build.sh
 -fi
 -
  cd kpayload
+-make clean
  make
  cd ..
 
@@ -52,12 +53,18 @@ diff --git a/build.sh b/build.sh
 -# including as headers doesn't do it
  for file in *.prx; do
    echo $file
--  xxd -i "$file" > "../installer/source/${file}.c"
-+  xxd -i "$file" > "/build/source/installer/source/${file}.c"
+-  xxd -i "$file" | sed 's/^unsigned /static const unsigned /' > "../installer/source/${file}.inc.c"
++  xxd -i "$file" | sed 's/^unsigned /static const unsigned /' > "/build/source/installer/source/${file}.inc.c"
  done
 
 -cd ..
 +popd
 
+-xxd -i "hen.ini" | sed 's/^unsigned /static const unsigned /' > "installer/source/hen.ini.inc.c"
++xxd -i "hen.ini" | sed 's/^unsigned /static const unsigned /' > "/build/source/installer/source/hen.ini.inc.c"
+
  cd installer
+-make clean
  make
+ cd ..
+

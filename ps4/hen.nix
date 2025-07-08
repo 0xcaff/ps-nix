@@ -16,15 +16,41 @@ flake-utils.lib.eachSystem supported-systems (
     localPkgs = self.packages.${pkgs.system};
   in
   {
+    packages.ps4-libjbc =
+      let
+        version = "d3fb28fce137c5ca0453428ed5c5476bf4cf4d14";
+      in
+
+      pkgs.stdenvNoCC.mkDerivation {
+        pname = "ps4-libjbc";
+        inherit version;
+
+        src = pkgs.fetchFromGitHub {
+          owner = "illusion0001";
+          repo = "ps4-libjbc";
+          rev = version;
+          sha256 = "sha256-AtWs+mki+1UK+pYEDBtvIpis8nzfLIXcY1x0QZto/HA=";
+        };
+
+        buildInputs = [
+          pkgs.llvmPackages.clang-unwrapped
+          pkgs.llvmPackages.bintools-unwrapped
+          localPkgs.toolchain
+        ];
+
+        patchPhase = ''
+          substituteInPlace Makefile --replace-fail 'libjbc.h $(OO_PS4_TOOLCHAIN)/include' "libjbc.h $out/include"
+          substituteInPlace Makefile --replace-fail '$(TARGET).a $(OO_PS4_TOOLCHAIN)/lib' '$(TARGET).a '$out/lib
+
+          mkdir -p $out/{include,lib}
+        '';
+
+        dontFixup = true;
+      };
+
     packages.ps4-hen-plugins =
       let
-        version = "4ca02a21d4cf98e87dd1b622031e54fb77f224ca";
-        libjbc = pkgs.fetchFromGitHub {
-          owner = "bucanero";
-          repo = "ps4-libjbc";
-          rev = "835fe016ff0ae5dd89b9249f39cc0fe093fd07dd";
-          sha256 = "sha256-qq0Gj4846WcyyS2FCXGT/jCQuQGedUmk21xwovLJ8XE=";
-        };
+        version = "b41";
       in
       pkgs.stdenvNoCC.mkDerivation {
         pname = "ps4-hen-plugins";
@@ -32,7 +58,13 @@ flake-utils.lib.eachSystem supported-systems (
 
         buildInputs = [
           pkgs.clang
-          pkgs.llvmPackages.bintools-unwrapped
+          pkgs.xxd
+          (pkgs.symlinkJoin {
+            name = pkgs.llvmPackages_18.bintools-unwrapped.name;
+            paths = [ pkgs.llvmPackages_18.bintools-unwrapped ];
+            buildInputs = [ pkgs.makeWrapper ];
+            postBuild = "wrapProgram $out/bin/ld.lld --add-flags '-L${localPkgs.ps4-libjbc}/lib'";
+          })
           localPkgs.toolchain
         ];
 
@@ -40,10 +72,11 @@ flake-utils.lib.eachSystem supported-systems (
           owner = "Scene-Collective";
           repo = "ps4-hen-plugins";
           rev = version;
-          sha256 = "sha256-yNbw7Jfy2onpuTtMWBGER5Dqqk8oaCCgbVqRFs9dgR8=";
+          sha256 = "sha256-o4T/kS/E60f1TPE9U05CCrDmVX9sp5N6YbaMDmhOvE4=";
         };
 
         patchPhase = ''
+          substituteInPlace build.sh --replace-fail '/bin/bash' '${pkgs.bash}/bin/bash'
           substituteInPlace **/Makefile \
             --replace-fail '$(shell git rev-parse HEAD)' ${version}
           substituteInPlace **/Makefile \
@@ -52,66 +85,71 @@ flake-utils.lib.eachSystem supported-systems (
             --replace-fail '$(shell git rev-list HEAD --count)' '0'
           substituteInPlace **/Makefile \
             --replace-fail "\$(shell date '+%b %d %Y @ %T')" 'Jul 05 2025 @ 12:27:30'
-          substituteInPlace plugin_server/source/*.{c,h} \
-            --replace-quiet '../../extern/libjbc' ${libjbc}
+          substituteInPlace plugin_server/Makefile \
+            --replace-fail 'make -C ../extern/libjbc install' ' '
+          substituteInPlace plugin_server/source/lib.c \
+            --replace-fail '../../extern/libjbc/libjbc.h' ${localPkgs.ps4-libjbc}/include/libjbc.h
+          chmod +x build.sh
         '';
 
         buildPhase = ''
-          make -C plugin_bootloader
-          make -C plugin_loader
-          make -C plugin_example
-          make -C plugin_server
+          bash int3.sh 4096 > common/cave.inc.c
+          ./build.sh
         '';
 
         installPhase = ''
-          cp -r bin/plugins/prx_final $out
+          cp -r bin/plugins/prx $out
         '';
 
         hardeningDisable = [ "all" ];
         dontFixup = true;
       };
 
-    packages.ps4-hen = pkgs.stdenvNoCC.mkDerivation {
-      pname = "ps4-hen";
-      version = "0acd34983a6417423382aaf807f09c530f06f198";
+    packages.ps4-hen =
+      let
+        version = "pre-release-main-130";
+      in
+      pkgs.stdenvNoCC.mkDerivation {
+        pname = "ps4-hen";
+        inherit version;
 
-      buildInputs = [
-        pkgs.xxd
-        localPkgs.ps4-payload-sdk
-        (pkgs.symlinkJoin {
-          name = pkgs.gcc-unwrapped.name;
-          paths = [ pkgs.gcc-unwrapped ];
-          buildInputs = [ pkgs.makeWrapper ];
-          postBuild = "wrapProgram $out/bin/gcc --add-flags '-fcf-protection=branch -fPIE -pie'";
-        })
-        pkgs.bintools-unwrapped
-      ];
+        buildInputs = [
+          pkgs.xxd
+          localPkgs.ps4-payload-sdk
+          (pkgs.symlinkJoin {
+            name = pkgs.gcc-unwrapped.name;
+            paths = [ pkgs.gcc-unwrapped ];
+            buildInputs = [ pkgs.makeWrapper ];
+            postBuild = "wrapProgram $out/bin/gcc --add-flags '-fcf-protection=branch -fPIE -pie'";
+          })
+          pkgs.bintools-unwrapped
+        ];
 
-      src = pkgs.fetchFromGitHub {
-        owner = "illusion0001";
-        repo = "ps4-hen-fork";
-        rev = "0acd34983a6417423382aaf807f09c530f06f198";
-        sha256 = "sha256-9oU4XgszogYnGeJ06Ep2LjDke4jYUJr9i4aijbjYjS4=";
+        src = pkgs.fetchFromGitHub {
+          owner = "Scene-Collective";
+          repo = "ps4-hen";
+          rev = version;
+          sha256 = "sha256-hmuL2BZ/ASGGCIsVA5dXKVgt6SJxCssr6kpDdVEnrq8=";
+        };
+
+        patches = [ ./hen.patch ];
+
+        postPatch = ''
+          substituteInPlace build.sh \
+            --replace-fail '@pluginsPath@' ${localPkgs.ps4-hen-plugins}
+          substituteInPlace build.sh --replace-fail '/bin/bash' '${pkgs.bash}/bin/bash'
+        '';
+
+        buildPhase = ''
+          ./build.sh
+        '';
+
+        installPhase = ''
+          mkdir -p $out
+          cp hen.bin $out
+        '';
+
+        dontFixup = true;
       };
-
-      patches = [ ./hen.patch ];
-
-      postPatch = ''
-        substituteInPlace build.sh \
-          --replace-fail '@pluginsPath@' ${localPkgs.ps4-hen-plugins}
-        substituteInPlace build.sh --replace-fail '/bin/bash' '${pkgs.bash}/bin/bash'
-      '';
-
-      buildPhase = ''
-        ./build.sh
-      '';
-
-      installPhase = ''
-        mkdir -p $out
-        cp hen.bin $out
-      '';
-
-      dontFixup = true;
-    };
   }
 )
