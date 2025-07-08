@@ -183,7 +183,7 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 ===================================================================
 diff --git a/kpayload/source/main.c b/kpayload/source/main.c
 --- a/kpayload/source/main.c	(revision 8852b94cd3896f8a876dff1c980349ae737f625a)
-+++ b/kpayload/source/main.c	(date 1751991602897)
++++ b/kpayload/source/main.c	(date 1751992451988)
 @@ -89,8 +89,11 @@
  int (*sys_dynlib_load_prx)(void *param_1, void *param_2) PAYLOAD_BSS;
  int (*sys_dynlib_dlsym)(void *param_1, void *param_2) PAYLOAD_BSS;
@@ -206,13 +206,15 @@ diff --git a/kpayload/source/main.c b/kpayload/source/main.c
  }
 
  PAYLOAD_CODE int my_hex_to_int(char c) {
-@@ -345,6 +351,28 @@
+@@ -345,6 +351,30 @@
    writeCr0(cr0);
  }
 
 +PAYLOAD_CODE int my_scan_phdr(struct image_params* p_ImageParams, struct elf64_phdr* p_ProgramHeaders, uint64_t p_ProgramHeaderCount, uint32_t* p_TextSizeFlag) {
++    printf("my_scan_phdr: entry\n");
 +    int ret = scan_phdr(p_ImageParams, p_ProgramHeaders, p_ProgramHeaderCount, p_TextSizeFlag);
 +    if (p_ImageParams != NULL && p_ImageParams->tls_addr != 0 && p_ImageParams->tls_mem_size != 0) {
++        printf("my_scan_phdr: applying patch\n");
 +        p_ImageParams->tls_mem_size += 0x20;
 +    }
 +    return ret;
@@ -235,7 +237,7 @@ diff --git a/kpayload/source/main.c b/kpayload/source/main.c
  PAYLOAD_CODE int my_entrypoint(uint16_t fw_version_arg, struct configuration config_arg) {
    fw_version = fw_version_arg;
    fw_offsets = get_offsets_for_fw(fw_version);
-@@ -356,6 +384,7 @@
+@@ -356,6 +386,7 @@
    printf("Hello from KPayload: %i\n", fw_version);
    install_fself_hooks();
    install_fpkg_hooks();
@@ -243,10 +245,8 @@ diff --git a/kpayload/source/main.c b/kpayload/source/main.c
    if (!config.skip_patches) {
      install_patches();
    }
-@@ -379,3 +408,4 @@
+@@ -379,3 +410,4 @@
  int _start() {
    return 0;
  }
 +
-
-
