@@ -28,7 +28,12 @@ flake-utils.lib.eachSystem supported-systems (
       };
 
       buildInputs = [
-        pkgs.gcc-unwrapped
+        (pkgs.symlinkJoin {
+          name = pkgs.gcc-unwrapped.name;
+          paths = [ pkgs.gcc-unwrapped ];
+          buildInputs = [ pkgs.makeWrapper ];
+          postBuild = "wrapProgram $out/bin/gcc --add-flags '-fcf-protection=branch -fPIE -pie'";
+        })
         pkgs.binutils-unwrapped-all-targets
       ];
 

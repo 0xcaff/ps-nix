@@ -13,7 +13,7 @@ flake-utils.lib.eachSystem supported-systems (
   system:
   let
     pkgs = import nixpkgs { inherit system; };
-    version = "fb4ab5ffa97e083775ccad3a95e2348fc6b53e1c";
+    version = "8164f26167a3411810ae3b07e510e1f77da2b2b8";
 
     freebsd_headers = pkgs.fetchFromGitHub {
       owner = "OpenOrbis";
@@ -28,15 +28,19 @@ flake-utils.lib.eachSystem supported-systems (
       inherit version;
 
       src = pkgs.fetchFromGitHub {
-        owner = "TheOfficialFloW";
+        owner = "EchoStretch";
         repo = "PPPwn";
         rev = version;
-        hash = "sha256-jSxF8Ara5Iu26X9k89bpB/5ogUwgXreJueDGuLIlbgo=";
+        hash = "sha256-V3Q023SpriqT7G1GcxidtZW3giiOSQ6MpBsB/Tzv+VY=";
       };
 
-      patchPhase = ''
+      patches = [
+        ./pppwn.patch
+      ];
+
+      postPatch = ''
         substituteInPlace **/Makefile \
-          --replace-fail '../freebsd-headers' '${freebsd_headers}'
+          --replace-warn '../freebsd-headers' '${freebsd_headers}'
       '';
 
       buildInputs = [
@@ -48,7 +52,7 @@ flake-utils.lib.eachSystem supported-systems (
 
       buildPhase = ''
         make -C stage1
-        make -C stage2
+        make -C stage2 USB_LOADER=1
       '';
 
       installPhase = ''

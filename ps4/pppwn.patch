@@ -1,0 +1,18 @@
+Index: stage2/stage2.c
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/stage2/stage2.c b/stage2/stage2.c
+--- a/stage2/stage2.c	(revision 8164f26167a3411810ae3b07e510e1f77da2b2b8)
++++ b/stage2/stage2.c	(date 1751941243625)
+@@ -649,7 +649,7 @@
+
+ #ifdef USB_LOADER
+ #define EEXIST 17
+-static const int PAYLOAD_SZ = 0x80000;
++static const int PAYLOAD_SZ = 0x800000;
+
+ // Function pointers and variables as per your environment
+ void *buffer = NULL;
+
