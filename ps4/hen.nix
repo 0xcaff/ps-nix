@@ -50,7 +50,7 @@ flake-utils.lib.eachSystem supported-systems (
 
     packages.ps4-hen-plugins =
       let
-        version = "b41";
+        version = "b46";
       in
       pkgs.stdenvNoCC.mkDerivation {
         pname = "ps4-hen-plugins";
@@ -72,7 +72,7 @@ flake-utils.lib.eachSystem supported-systems (
           owner = "Scene-Collective";
           repo = "ps4-hen-plugins";
           rev = version;
-          sha256 = "sha256-o4T/kS/E60f1TPE9U05CCrDmVX9sp5N6YbaMDmhOvE4=";
+          sha256 = "sha256-YD4QFKYlZtBn/AGWhQWBA8vm+JCIjxPJZYaCZhbggR0=";
         };
 
         patchPhase = ''
@@ -107,7 +107,7 @@ flake-utils.lib.eachSystem supported-systems (
 
     packages.ps4-hen =
       let
-        version = "pre-release-main-130";
+        version = "pre-release-main-119";
       in
       pkgs.stdenvNoCC.mkDerivation {
         pname = "ps4-hen";
@@ -129,7 +129,7 @@ flake-utils.lib.eachSystem supported-systems (
           owner = "Scene-Collective";
           repo = "ps4-hen";
           rev = version;
-          sha256 = "sha256-hmuL2BZ/ASGGCIsVA5dXKVgt6SJxCssr6kpDdVEnrq8=";
+          sha256 = "sha256-Vxbsxuw+oqaw0E+E8vsleiqzO1OeBh683pJpukjJwhE=";
         };
 
         patches = [ ./hen.patch ];
