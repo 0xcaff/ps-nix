@@ -14,6 +14,7 @@ flake-utils.lib.eachSystem supported-systems (
   let
     pkgs = import nixpkgs { inherit system; };
     version = "99113ef9ae38bdc76fa8e741dd70d9423417b0a1";
+    localPkgs = self.packages.${pkgs.system};
   in
   {
     packages.ps4-payload-sdk = pkgs.stdenvNoCC.mkDerivation {
@@ -53,5 +54,40 @@ flake-utils.lib.eachSystem supported-systems (
 
       dontFixup = true;
     };
+
+    packages.ps4-kernel-dumper = pkgs.stdenvNoCC.mkDerivation {
+      pname = "ps4-kernel-dumper";
+      inherit version;
+
+      src = pkgs.fetchFromGitHub {
+        owner = "Scene-Collective";
+        repo = "ps4-kernel-dumper";
+        rev = "42fce7e6f2cf65b25e39a38373ab697593a19f12";
+        sha256 = "sha256-dSK7rkajBj1T42KRYk0gO/PbRDMuZgqLtUBhmavxxbQ=";
+      };
+
+      buildInputs = [
+        (pkgs.symlinkJoin {
+          name = pkgs.gcc-unwrapped.name;
+          paths = [ pkgs.gcc-unwrapped ];
+          buildInputs = [ pkgs.makeWrapper ];
+          postBuild = "wrapProgram $out/bin/gcc --add-flags '-fcf-protection=branch -fPIE -pie'";
+        })
+        localPkgs.ps4-payload-sdk
+        pkgs.binutils-unwrapped-all-targets
+      ];
+
+      buildPhase = ''
+        make
+      '';
+
+      installPhase = ''
+        mkdir -p $out
+        mv source.bin $out/ps4-kernel-dumper.bin
+      '';
+
+      dontFixup = true;
+    };
+
   }
 )
