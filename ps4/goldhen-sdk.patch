@@ -5,7 +5,7 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 ===================================================================
 diff --git a/Makefile b/Makefile
 --- a/Makefile	(revision bcea3c7ef01dac6d7f9f49ebf9e90fe66d86f5f7)
-+++ b/Makefile	(date 1708375093373)
++++ b/Makefile	(date 1752042772491)
 @@ -51,7 +51,7 @@
  		CCX     := clang++
  		LD      := ld.lld
@@ -17,10 +17,62 @@ diff --git a/Makefile b/Makefile
  		CC      := /usr/local/opt/llvm/bin/clang
 @@ -66,7 +66,7 @@
  	$(TOOLCHAIN)/bin/$(CDIR)/create-fself -in=$(INTDIR)/$(PROJDIR).elf -out=$(INTDIR)/$(PROJDIR).oelf --lib=$(TARGET) --paid 0x3800000000000011
- 
+
  $(TARGETSTATIC): $(INTDIR) $(OBJS)
 -	$(AR) --format=bsd rcs $(TARGETSTATIC) $(TARGETCRT) $(INTDIR)/*.o
 +	$(AR) rcs $(TARGETSTATIC) $(TARGETCRT) $(INTDIR)/*.o
- 
+
  $(TARGETSTUB): $(INTDIR) $(STUBOBJS)
  	$(CC) $(INTDIR)/*.o.stub -o $(TARGETSTUB) -target x86_64-pc-linux-gnu -shared -fuse-ld=lld -ffreestanding -nostdlib -fno-builtin -L$(TOOLCHAIN)/lib $(LIBS)
+Index: source/Detour.c
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/source/Detour.c b/source/Detour.c
+--- a/source/Detour.c	(revision bcea3c7ef01dac6d7f9f49ebf9e90fe66d86f5f7)
++++ b/source/Detour.c	(date 1752042828606)
+@@ -175,19 +175,27 @@
+         return 0;
+     }
+
++    klog("[Detour] stage1\n");
+     Detour_WriteJump64(This, This->TrampolinePtr, (uint64_t) HookPtr);
+
+     // Save Pointers for later
++    klog("[Detour] stage2\n");
+     This->FunctionPtr = (void *)FunctionPtr;
++    klog("[Detour] stage3\n");
+     This->HookPtr = HookPtr;
+
++    klog("[Detour] stage4\n");
+     // Set protection.
+     sceKernelMprotect((void *) FunctionPtr, InstructionSize, VM_PROT_ALL);
++
++    klog("[Detour] stage5\n");
+
+     //Allocate Executable memory for stub and write instructions to stub and a jump back to original execution.
+     This->StubSize = (InstructionSize + sizeof(This->JumpInstructions64));
++    klog("[Detour] stage6\n");
+
+     int res = sceKernelMmap(0, This->StubSize, VM_PROT_ALL, 0x1000 | 0x2, -1, 0, &This->StubPtr);
++    klog("[Detour] stage7\n");
+
+     if (res < 0 || This->StubPtr == 0) {
+ #if (DEBUG) == 1
+@@ -196,11 +204,15 @@
+         return 0;
+     }
+
++    klog("[Detour] stage8\n");
+     memcpy(This->StubPtr, (void *) FunctionPtr, InstructionSize);
++    klog("[Detour] stage9\n");
+     Detour_WriteJump64(This, (void *) ((uint64_t)This->StubPtr + InstructionSize), (uint64_t)(FunctionPtr + InstructionSize));
++    klog("[Detour] stage10\n");
+
+     // Write jump from function to hook.
+     memset((void *) FunctionPtr, 0x90, InstructionSize);
++    klog("[Detour] stage11\n");
+     Detour_WriteJump32(This, (void *) FunctionPtr, (uint64_t) This->TrampolinePtr);
+
+ #if (DEBUG) == 1
