@@ -6,10 +6,10 @@ flake-utils.lib.meld inputs [
   ./create-gp4.nix
   ./readoelf.nix
   ./toolchain.nix
-  ./goldhen-sdk.nix
   ./shell.nix
   ./payload-sdk.nix
   ./hen.nix
   ./pppwn_cpp.nix
   ./pppwn.nix
+  ./pkgs.nix
 ]
