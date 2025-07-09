@@ -139,6 +139,7 @@ flake-utils.lib.eachSystem supported-systems (
         patches = [
           ./hen.patch
           ./hen-tls.patch
+          ./hen-ini.patch
         ];
 
         postPatch = ''

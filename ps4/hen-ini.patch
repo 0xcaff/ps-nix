@@ -1,0 +1,17 @@
+Index: hen.ini
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/hen.ini b/hen.ini
+--- a/hen.ini	(revision 8852b94cd3896f8a876dff1c980349ae737f625a)
++++ b/hen.ini	(date 1752091823350)
+@@ -9,7 +9,7 @@
+ ; across different exploits and firmware versions.
+ ; Values: 0 = disabled, 1 = enabled
+ ; Default: 0
+-exploit_fixes = 0
++exploit_fixes = 1
+
+ ; Enable memory mapping patches for decrypting binary files. These patches
+ ; allow the system to properly handle encrypted executables and libraries.
