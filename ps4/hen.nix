@@ -75,7 +75,9 @@ flake-utils.lib.eachSystem supported-systems (
           sha256 = "sha256-YD4QFKYlZtBn/AGWhQWBA8vm+JCIjxPJZYaCZhbggR0=";
         };
 
-        patchPhase = ''
+        patches = [ ./plugins.patch ];
+
+        postPatch = ''
           substituteInPlace build.sh --replace-fail '/bin/bash' '${pkgs.bash}/bin/bash'
           substituteInPlace **/Makefile \
             --replace-fail '$(shell git rev-parse HEAD)' ${version}
@@ -88,6 +90,8 @@ flake-utils.lib.eachSystem supported-systems (
           substituteInPlace plugin_server/Makefile \
             --replace-fail 'make -C ../extern/libjbc install' ' '
           substituteInPlace plugin_server/source/lib.c \
+            --replace-fail '../../extern/libjbc/libjbc.h' ${localPkgs.ps4-libjbc}/include/libjbc.h
+          substituteInPlace plugin_bootloader/source/main.c \
             --replace-fail '../../extern/libjbc/libjbc.h' ${localPkgs.ps4-libjbc}/include/libjbc.h
           chmod +x build.sh
         '';
@@ -132,7 +136,10 @@ flake-utils.lib.eachSystem supported-systems (
           sha256 = "sha256-Vxbsxuw+oqaw0E+E8vsleiqzO1OeBh683pJpukjJwhE=";
         };
 
-        patches = [ ./hen.patch ./hen-tls.patch ];
+        patches = [
+          ./hen.patch
+          ./hen-tls.patch
+        ];
 
         postPatch = ''
           substituteInPlace build.sh \

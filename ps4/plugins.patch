@@ -1,0 +1,94 @@
+Index: plugin_bootloader/source/main.c
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/plugin_bootloader/source/main.c b/plugin_bootloader/source/main.c
+--- a/plugin_bootloader/source/main.c	(revision d0c406587020f0d0d687964b705ee7e6a5132d13)
++++ b/plugin_bootloader/source/main.c	(date 1752038105344)
+@@ -7,6 +7,8 @@
+ #include "notify.h"
+ #include "path.h"
+
++#include "../../extern/libjbc/libjbc.h"
++
+ attr_public const char* g_pluginName = "bootloader";
+ attr_public const char* g_pluginDesc = "Bootloader plugin.";
+ attr_public const char* g_pluginAuth = "illusiony";
+@@ -18,8 +20,50 @@
+                                           "\n"
+                                           "Built: " BUILD_DATE;
+
++static int jbc_jailbreak_cred_device(jbc_cred* ans)
++{
++    const uintptr_t rootvnode = jbc_get_rootvnode();
++    if (!rootvnode)
++    {
++        return -1;
++    }
++    // for devices
++    ans->sceProcCap = 0xffffffffffffffff;
++    ans->uid = 0;
++    ans->rdir = rootvnode;
++    return 0;
++}
++
++static void open_dev_console(void)
++{
++    jbc_cred g_Cred;
++    jbc_cred g_RootCreds;
++    jbc_get_cred(&g_Cred);
++    g_RootCreds = g_Cred;
++    jbc_jailbreak_cred_device(&g_RootCreds);
++    jbc_set_cred(&g_RootCreds);
++    extern int open(const char*, int);
++    extern int close(int);
++    extern int dup2(int, int);
++    const int O_WRONLY_ = 2;
++    const int stdout_ = 1;
++    const int stderr_ = 2;
++    const int fd = open("/dev/console", O_WRONLY_);
++    if (fd > 0)
++    {
++        dup2(fd, stdout_);
++        dup2(fd, stderr_);
++        close(fd);
++    }
++    printf("console %d\n", fd);
++    // unjailbreak
++    jbc_set_cred(&g_Cred);
++}
++
+ int32_t attr_public plugin_load(struct SceEntry* args, const void* atexit_handler)
+ {
++    open_dev_console();
++
+     final_printf("%s Plugin Started.\n", g_pluginName);
+     final_printf("%s\n", g_pluginVersion);
+     final_printf("Plugin Author(s): %s\n", g_pluginAuth);
+@@ -37,6 +81,8 @@
+         sceKernelDlsym(m, unload_sym, (void**)&unload);
+         if (load)
+         {
++            Notify(TEX_ICON_SYSTEM, "loading!");
++
+             if (load(args) && unload)
+             {
+                 unload(args);
+Index: plugin_bootloader/Makefile
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/plugin_bootloader/Makefile b/plugin_bootloader/Makefile
+--- a/plugin_bootloader/Makefile	(revision d0c406587020f0d0d687964b705ee7e6a5132d13)
++++ b/plugin_bootloader/Makefile	(date 1752038035595)
+@@ -16,7 +16,7 @@
+ TARGETSTUB   := $(OUTPUT_PRX).so
+
+ # Libraries linked into the ELF.
+-LIBS := -lSceLibcInternal -lkernel
++LIBS := -lSceLibcInternal -lkernel -ljbc
+
+ EXTRAFLAGS := -fvisibility=hidden $(DEBUG_FLAGS) $(LOG_TYPE) -fcolor-diagnostics -Wall
+
