@@ -40,4 +40,6 @@ stdenv.mkDerivation {
     export GOLDHEN_SDK=$out
     EOF
   '';
+
+  dontFixup = true;
 }
