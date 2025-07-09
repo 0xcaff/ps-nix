@@ -36,7 +36,7 @@ flake-utils.lib.eachSystem supported-systems (
       patches = [ ./goldhen-sdk.patch ];
 
       buildPhase = ''
-        make
+        make DEBUGFLAGS=1
         rm -f Makefile.orig
       '';
 
