@@ -19,6 +19,8 @@ flake-utils.lib.eachSystem supported-systems (
       packages = [
         self.packages.${system}.toolchain
         self.packages.${system}.goldhen-sdk
+        pkgs.llvmPackages_18.bintools-unwrapped
+        pkgs.llvmPackages_18.clang-unwrapped
       ];
     };
   }
