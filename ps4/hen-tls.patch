@@ -5,7 +5,7 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 ===================================================================
 diff --git a/kpayload/source/offsets/505.c b/kpayload/source/offsets/505.c
 --- a/kpayload/source/offsets/505.c	(revision 8852b94cd3896f8a876dff1c980349ae737f625a)
-+++ b/kpayload/source/offsets/505.c	(date 1751955549115)
++++ b/kpayload/source/offsets/505.c	(date 1752164793939)
 @@ -62,6 +62,9 @@
    .vm_map_lookup_entry_addr        = 0x0019F760,
    .proc_rwmem_addr                 = 0x0030D150,
@@ -23,7 +23,7 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 ===================================================================
 diff --git a/kpayload/include/offsets.h b/kpayload/include/offsets.h
 --- a/kpayload/include/offsets.h	(revision 8852b94cd3896f8a876dff1c980349ae737f625a)
-+++ b/kpayload/include/offsets.h	(date 1751989551500)
++++ b/kpayload/include/offsets.h	(date 1752164793933)
 @@ -69,6 +69,10 @@
    uint32_t vm_map_lookup_entry_addr;
    uint32_t proc_rwmem_addr;
@@ -42,7 +42,7 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 ===================================================================
 diff --git a/kpayload/source/offsets/900.c b/kpayload/source/offsets/900.c
 --- a/kpayload/source/offsets/900.c	(revision 8852b94cd3896f8a876dff1c980349ae737f625a)
-+++ b/kpayload/source/offsets/900.c	(date 1751991072803)
++++ b/kpayload/source/offsets/900.c	(date 1752164793951)
 @@ -62,6 +62,10 @@
    .vm_map_lookup_entry_addr        = 0x0007C1C0,
    .proc_rwmem_addr                 = 0x0041EB00,
@@ -61,7 +61,7 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 ===================================================================
 diff --git a/kpayload/source/offsets/672.c b/kpayload/source/offsets/672.c
 --- a/kpayload/source/offsets/672.c	(revision 8852b94cd3896f8a876dff1c980349ae737f625a)
-+++ b/kpayload/source/offsets/672.c	(date 1751955549126)
++++ b/kpayload/source/offsets/672.c	(date 1752164793945)
 @@ -62,6 +62,9 @@
    .vm_map_lookup_entry_addr        = 0x0044D330,
    .proc_rwmem_addr                 = 0x0010EE10,
@@ -79,7 +79,7 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 ===================================================================
 diff --git a/kpayload/include/freebsd_helper.h b/kpayload/include/freebsd_helper.h
 --- a/kpayload/include/freebsd_helper.h	(revision 8852b94cd3896f8a876dff1c980349ae737f625a)
-+++ b/kpayload/include/freebsd_helper.h	(date 1751958175803)
++++ b/kpayload/include/freebsd_helper.h	(date 1752164793926)
 @@ -170,4 +170,76 @@
  // TYPE_FIELD(char path[64], 0x474); // 6.50+ (TODO: Confirm it hasn't changed since 6.50)
  TYPE_END();
@@ -164,7 +164,7 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 ===================================================================
 diff --git a/kpayload/source/offsets/1100.c b/kpayload/source/offsets/1100.c
 --- a/kpayload/source/offsets/1100.c	(revision 8852b94cd3896f8a876dff1c980349ae737f625a)
-+++ b/kpayload/source/offsets/1100.c	(date 1751991072806)
++++ b/kpayload/source/offsets/1100.c	(date 1752164793957)
 @@ -62,6 +62,10 @@
    .vm_map_lookup_entry_addr        = 0x00357EF0,
    .proc_rwmem_addr                 = 0x003838A0,
@@ -183,7 +183,7 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 ===================================================================
 diff --git a/kpayload/source/main.c b/kpayload/source/main.c
 --- a/kpayload/source/main.c	(revision 8852b94cd3896f8a876dff1c980349ae737f625a)
-+++ b/kpayload/source/main.c	(date 1751992451988)
++++ b/kpayload/source/main.c	(date 1752164793967)
 @@ -89,8 +89,11 @@
  int (*sys_dynlib_load_prx)(void *param_1, void *param_2) PAYLOAD_BSS;
  int (*sys_dynlib_dlsym)(void *param_1, void *param_2) PAYLOAD_BSS;
@@ -213,7 +213,7 @@ diff --git a/kpayload/source/main.c b/kpayload/source/main.c
 +PAYLOAD_CODE int my_scan_phdr(struct image_params* p_ImageParams, struct elf64_phdr* p_ProgramHeaders, uint64_t p_ProgramHeaderCount, uint32_t* p_TextSizeFlag) {
 +    printf("my_scan_phdr: entry\n");
 +    int ret = scan_phdr(p_ImageParams, p_ProgramHeaders, p_ProgramHeaderCount, p_TextSizeFlag);
-+    if (p_ImageParams != NULL && p_ImageParams->tls_addr != 0 && p_ImageParams->tls_mem_size != 0) {
++    if (p_ImageParams != NULL && p_ImageParams->tls_addr != 0) {
 +        printf("my_scan_phdr: applying patch\n");
 +        p_ImageParams->tls_mem_size += 0x20;
 +    }
