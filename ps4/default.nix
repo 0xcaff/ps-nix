@@ -12,4 +12,5 @@ flake-utils.lib.meld inputs [
   ./pppwn_cpp.nix
   ./pppwn.nix
   ./pkgs.nix
+  ./fake-pkg-tools.nix
 ]
