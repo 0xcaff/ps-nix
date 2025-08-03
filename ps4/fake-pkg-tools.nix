@@ -31,7 +31,7 @@ flake-utils.lib.eachSystem supported-systems (system:
       };
 
       nativeBuildInputs = [
-        pkgs.wine64Packages.stable
+        pkgs.wineWow64Packages.stable
         pkgs.makeWrapper
       ];
 
@@ -48,7 +48,7 @@ flake-utils.lib.eachSystem supported-systems (system:
         mkdir -p $out/bin
         for exe in ${builtins.concatStringsSep " " winTools}; do
           name=''${exe%.exe}
-          makeWrapper ${pkgs.wine64Packages.stable}/bin/wine \
+          makeWrapper ${pkgs.wineWow64Packages.stable}/bin/wine \
             $out/bin/$name \
             --add-flags "$out/share/$exe"
         done
