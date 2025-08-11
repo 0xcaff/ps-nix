@@ -35,7 +35,7 @@ flake-utils.lib.eachSystem supported-systems (
 
           sourceRoot = "source/C";
 
-          makeFlags = lib.optionals stdenv.isDarwin [
+          makeFlags = pkgs.lib.optionals pkgs.stdenv.isDarwin [
             "LDFLAGS=-dynamiclib"
           ];
 
