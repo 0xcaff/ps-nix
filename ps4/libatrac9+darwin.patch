@@ -1,0 +1,26 @@
+Index: C/Makefile
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/C/Makefile b/C/Makefile
+--- a/C/Makefile	(revision efca2e3af35562a09a9bb6deed90e45b4b824dc4)
++++ b/C/Makefile	(date 1754950395228)
+@@ -7,7 +7,7 @@
+ CFLAGS = $(EXTRA_CFLAGS) -Wall -Wextra -std=c99
+ SHARED_SFLAGS = $(SFLAGS) -flto
+ SHARED_CFLAGS = $(CFLAGS) -fPIC
+-LDFLAGS = -shared -s -Wl,--version-script=libatrac9.version
++LDFLAGS = -shared
+
+ SRCDIR = src
+ OBJDIR = obj
+@@ -20,7 +20,7 @@
+ SHARED_OBJS = $(SRCS:$(SRCDIR)/%.c=$(SHARED_OBJDIR)/%.o)
+
+ STATIC_FILENAME = $(NAME).a
+-SHARED_FILENAME = $(NAME).so
++SHARED_FILENAME = $(NAME).dylib
+ STATIC_NAME = $(BINDIR)/$(STATIC_FILENAME)
+ SHARED_NAME = $(BINDIR)/$(SHARED_FILENAME)
+
