@@ -15,18 +15,20 @@ let
     "orbis-pub-trp.exe"
   ];
 in
-flake-utils.lib.eachSystem supported-systems (system:
+flake-utils.lib.eachSystem supported-systems (
+  system:
   let
     pkgs = import nixpkgs { inherit system; };
-  in {
+  in
+  {
     packages.fake-pkg-tools = pkgs.stdenvNoCC.mkDerivation {
-      pname   = "fake-pkg-tools";
+      pname = "fake-pkg-tools";
       version = "3.87";
 
       src = pkgs.fetchFromGitHub {
-        owner  = "CyB1K";
-        repo   = "PS4-Fake-PKG-Tools-3.87";
-        rev    = "c08d922e8998cb413f44fdb005c7d6d7eb1b1f13";
+        owner = "CyB1K";
+        repo = "PS4-Fake-PKG-Tools-3.87";
+        rev = "c08d922e8998cb413f44fdb005c7d6d7eb1b1f13";
         sha256 = "sha256-QOU6qqT24Dnqo5cnJezgwaSOLVwscHZ62nrQgwShNa4=";
       };
 
@@ -54,4 +56,5 @@ flake-utils.lib.eachSystem supported-systems (system:
         done
       '';
     };
-  })
+  }
+)
