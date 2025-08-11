@@ -2,6 +2,7 @@ inputs@{ flake-utils, ... }:
 flake-utils.lib.meld inputs [
   ./create-fself
   ./orbis-lib-gen.nix
+  ./libatrac9.nix
   ./LibOrbisPkg
   ./create-gp4.nix
   ./readoelf.nix
