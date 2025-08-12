@@ -33,16 +33,12 @@ flake-utils.lib.eachSystem supported-systems (
             sha256 = "sha256-V919MhVCPG11k1qGJWKp52HZEkbYU/+Ca4qF18ougiA=";
           };
 
-          patches = pkgs.lib.optionals pkgs.stdenv.isDarwin [
-            ./libatrac9+darwin.patch
-          ];
-
-          makeFlags = [ "-C" "C" ];
+          makeFlags = [ "-C" "C" "LDFLAGS=-shared" ];
 
           installPhase = ''
             mkdir -p $out/{lib,include}
             cp C/bin/libatrac9.a $out/lib/
-            cp C/bin/libatrac9.${if pkgs.stdenv.isDarwin then "dylib" else "so"} $out/lib/
+            cp C/bin/libatrac9.so $out/lib/
             cp C/src/libatrac9.h $out/include/
           '';
         };
