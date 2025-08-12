@@ -26,6 +26,12 @@ flake-utils.lib.eachSystem supported-systems (
           pname = "libatrac9";
           version = rev;
 
+          nativeBuildInputs = [
+            pkgs.pkg-config
+          ];
+
+          outputs = [ "out" "dev" ];
+
           src = pkgs.fetchFromGitHub {
             owner = "Thealexbarney";
             repo = "LibAtrac9";
@@ -37,6 +43,13 @@ flake-utils.lib.eachSystem supported-systems (
 
           installPhase = ''
             mkdir -p $out/{lib,include}
+            mkdir -p $out/lib/pkgconfig
+
+            cp ${./libatrac9.pc} $out/lib/pkgconfig/atrac9.pc
+            substituteInPlace $out/lib/pkgconfig/atrac9.pc \
+              --replace-fail '@out@' $out \
+              --replace-fail '@dev@' $dev
+
             cp C/bin/libatrac9.a $out/lib/
             cp C/bin/libatrac9.so $out/lib/
             cp C/src/libatrac9.h $out/include/

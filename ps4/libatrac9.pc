@@ -1,0 +1,8 @@
+out=@out@
+dev=@dev@
+
+Name: atrac9
+Version: 1.0
+Description:
+Libs: -L${out}/lib -latrac9
+Cflags: -I${dev}/include
