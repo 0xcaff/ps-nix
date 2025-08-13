@@ -14,7 +14,13 @@ in
 flake-utils.lib.eachSystem supported-systems (
   system:
   let
-    pkgs = import nixpkgs { inherit system; };
+    pkgs = import nixpkgs {
+      inherit system;
+
+      config.permittedInsecurePackages = [
+        "openssl-1.1.1w"
+      ];
+    };
   in
   {
     packages.pkg-tool = pkgs.buildDotnetModule {

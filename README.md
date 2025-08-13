@@ -8,8 +8,8 @@ a collection of unofficial Playstation toolchains packaged in nix. Currently inc
 ## getting started
 
 ```
-nix develop github:0xcaff/ps-nix#ps2
-NIXPKGS_ALLOW_INSECURE=1 nix develop --impure github:0xcaff/ps-nix#ps4
+nix develop github:0xcaff/ps-nix#ps2dev
+nix develop --impure github:0xcaff/ps-nix#ps4
 ```
 
 ## why nix
