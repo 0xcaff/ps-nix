@@ -19,7 +19,7 @@ flake-utils.lib.eachSystem supported-systems (
   {
     packages =
       let
-        rev = "310dcba1f99b180a9361cc88e6352eeeca482a76";
+        rev = "cc620d9cdddb56ca0b55744b0eb722efb838f564";
       in
       flake-utils.lib.flattenTree {
         orbis-lib-gen = pkgs.stdenv.mkDerivation {
@@ -27,10 +27,10 @@ flake-utils.lib.eachSystem supported-systems (
           version = rev;
 
           src = pkgs.fetchFromGitHub {
-            owner = "OpenOrbis";
+            owner = "0xcaff";
             repo = "orbis-lib-gen";
             inherit rev;
-            sha256 = "sha256-XOncmloA3OIX8VzmP5UWShiqYWMndxt8knK5e2bjeJA=";
+            sha256 = "sha256-8wbZaulAvifK82NOvwU/3gyGBncxsKBjctWnD1GbxRo=";
           };
 
           propagatedBuildInputs = [ pkgs.python3 ];
