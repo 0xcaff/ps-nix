@@ -30,7 +30,10 @@ flake-utils.lib.eachSystem supported-systems (
             pkgs.pkg-config
           ];
 
-          outputs = [ "out" "dev" ];
+          outputs = [
+            "out"
+            "dev"
+          ];
 
           src = pkgs.fetchFromGitHub {
             owner = "Thealexbarney";
@@ -39,7 +42,11 @@ flake-utils.lib.eachSystem supported-systems (
             sha256 = "sha256-V919MhVCPG11k1qGJWKp52HZEkbYU/+Ca4qF18ougiA=";
           };
 
-          makeFlags = [ "-C" "C" "LDFLAGS=-shared" ];
+          makeFlags = [
+            "-C"
+            "C"
+            "LDFLAGS=-shared"
+          ];
 
           installPhase = ''
             mkdir -p $out/{lib,include}
