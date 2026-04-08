@@ -4,11 +4,10 @@ let
     name = "iop-binutils";
     version = "binutils-2_43_1";
 
-    src = pkgs.fetchFromGitHub {
-      owner = "bminor";
-      repo = "binutils-gdb";
-      rev = "f4c0f07037e79d5fc1c3be3172c6c7d60a9144f7";
-      sha256 = "sha256-2tzItSMVmAb8jcTKODRztXFY40DcL8KItBq0qTjb/tA=";
+    src = pkgs.fetchgit {
+      url = "https://sourceware.org/git/binutils-gdb.git";
+      rev = "beb2cdbcda911764b2bed5e57921fe90493260bd"; # binutils-2_43_1
+      hash = "sha256-p/zvtCd3uzZgn4DTAkG/SxSrk3U7TLA3Vy4lI0a/5OY=";
     };
 
     buildInputs = [
