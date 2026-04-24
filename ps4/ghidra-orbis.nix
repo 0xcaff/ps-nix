@@ -19,7 +19,8 @@ flake-utils.lib.eachSystem supported-systems (
     pkgs = import nixpkgs { inherit system; };
     ghidra-pkgs = import ghidra-nixpkgs { inherit system; };
 
-    java-runtime = ghidra-pkgs.jdk21_headless;
+    build-java-runtime = ghidra-pkgs.jdk21_headless;
+    gui-java-runtime = ghidra-pkgs.openjdk21;
     ghidra = ghidra-pkgs.ghidra-bin;
     ghidra-install-dir = "${ghidra}/lib/ghidra";
 
@@ -36,7 +37,7 @@ flake-utils.lib.eachSystem supported-systems (
 
       nativeBuildInputs = [
         pkgs.gradle_8
-        java-runtime
+        build-java-runtime
       ];
 
       dontUnpack = true;
@@ -48,7 +49,7 @@ flake-utils.lib.eachSystem supported-systems (
         export buildDir="$TMPDIR/GhidraOrbis"
         export HOME="$TMPDIR/home"
         export GRADLE_USER_HOME="$TMPDIR/gradle"
-        export JAVA_HOME=${java-runtime}
+        export JAVA_HOME=${build-java-runtime}
         export GHIDRA_INSTALL_DIR=${ghidra-install-dir}
 
         mkdir -p "$buildDir" "$HOME" "$GRADLE_USER_HOME"
@@ -95,7 +96,7 @@ flake-utils.lib.eachSystem supported-systems (
         chmod -R u+w "$out/lib"
         rm "$out/lib/ghidra/support/launch.sh"
         makeWrapper "$out/lib/ghidra/support/.launch.sh-wrapped" "$out/lib/ghidra/support/launch.sh" \
-          --prefix PATH : ${pkgs.lib.makeBinPath [ java-runtime ]}
+          --prefix PATH : ${pkgs.lib.makeBinPath [ gui-java-runtime ]}
 
         ln -s "$out/lib/ghidra/ghidraRun" "$out/bin/ghidra"
         ln -s "$out/lib/ghidra/support/analyzeHeadless" "$out/bin/ghidra-analyzeHeadless"
