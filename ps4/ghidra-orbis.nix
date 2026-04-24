@@ -34,29 +34,27 @@ flake-utils.lib.eachSystem supported-systems (
       pname = "ghidra-orbis-extension";
       version = "unstable-${builtins.substring 0 7 ghidra-orbis-rev}";
 
-      src = ghidra-orbis-src;
-
       nativeBuildInputs = [
         pkgs.gradle_8
         java-runtime
       ];
 
+      dontUnpack = true;
       dontConfigure = true;
-
-      setSourceRoot = ''
-        mv source GhidraOrbis
-        sourceRoot=GhidraOrbis
-      '';
 
       buildPhase = ''
         runHook preBuild
 
+        export buildDir="$TMPDIR/GhidraOrbis"
         export HOME="$TMPDIR/home"
         export GRADLE_USER_HOME="$TMPDIR/gradle"
         export JAVA_HOME=${java-runtime}
         export GHIDRA_INSTALL_DIR=${ghidra-install-dir}
 
-        mkdir -p "$HOME" "$GRADLE_USER_HOME"
+        mkdir -p "$buildDir" "$HOME" "$GRADLE_USER_HOME"
+        cp -r ${ghidra-orbis-src}/. "$buildDir"
+        chmod -R u+w "$buildDir"
+        cd "$buildDir"
 
         gradle --no-daemon buildExtension
 
@@ -67,7 +65,7 @@ flake-utils.lib.eachSystem supported-systems (
         runHook preInstall
 
         mkdir -p "$out"
-        cp dist/*.zip "$out/ghidra-orbis.zip"
+        cp "$buildDir"/dist/*.zip "$out/ghidra-orbis.zip"
 
         runHook postInstall
       '';
