@@ -10,6 +10,7 @@ a collection of unofficial Playstation toolchains packaged in nix. Currently inc
 ```
 nix develop github:0xcaff/ps-nix#ps2
 NIXPKGS_ALLOW_INSECURE=1 nix develop --impure github:0xcaff/ps-nix#ps4
+nix run github:0xcaff/ps-nix#ghidra-orbis
 ```
 
 ## why nix
@@ -26,3 +27,8 @@ or at least the next 10 years.
 
 i haven't really tried using these toolchains deeply yet. they're pinned to tip
 of main versions. they probably only work on x86_64-linux (maybe arm linux too).
+
+the `ghidra-orbis` runner uses `ghidra-bin` from
+`github:NixOS/nixpkgs/e291c0d2818a7415c7592534b39933a55368d65b#ghidra-bin`
+with the GhidraOrbis extension preinstalled. it is intended to work on
+`x86_64-linux`, `aarch64-linux`, and `aarch64-darwin`.

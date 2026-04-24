@@ -1,6 +1,7 @@
 inputs@{ flake-utils, ... }:
 flake-utils.lib.meld inputs [
   ./create-fself
+  ./ghidra-orbis.nix
   ./orbis-lib-gen.nix
   ./LibOrbisPkg
   ./create-gp4.nix
