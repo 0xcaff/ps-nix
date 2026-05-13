@@ -7,6 +7,7 @@
 let
   supported-systems = with flake-utils.lib.system; [
     x86_64-linux
+    x86_64-darwin
     aarch64-darwin
     aarch64-linux
   ];
@@ -21,6 +22,13 @@ flake-utils.lib.eachSystem supported-systems (
         "openssl-1.1.1w"
       ];
     };
+    darwinRuntimeId = "osx-x64";
+    darwinRuntimeFlags = pkgs.lib.optionals pkgs.stdenv.hostPlatform.isDarwin [
+      "-p:RuntimeIdentifier=${darwinRuntimeId}"
+      "-p:AppHostRuntimeIdentifier=${darwinRuntimeId}"
+      "-p:DefaultAppHostRuntimeIdentifier=${darwinRuntimeId}"
+      "-p:UseCurrentRuntimeIdentifier=false"
+    ];
   in
   {
     packages.pkg-tool = pkgs.buildDotnetModule {
@@ -38,13 +46,17 @@ flake-utils.lib.eachSystem supported-systems (
 
       projectFile = "PkgTool.Core/PkgTool.Core.csproj";
       preConfigureNuGet = ''
-        cp ${./nuget.config} nuget.config
+        rm -f nuget.config
+        install -m 0644 ${./nuget.config} nuget.config
       '';
 
       executables = "PkgTool.Core";
       selfContainedBuild = true;
+      runtimeId = if pkgs.stdenv.hostPlatform.isDarwin then darwinRuntimeId else null;
 
-      dotnetBuildFlags = "-p:InvariantGlobalization=true";
+      dotnetRestoreFlags = darwinRuntimeFlags;
+      dotnetBuildFlags = [ "-p:InvariantGlobalization=true" ] ++ darwinRuntimeFlags;
+      dotnetInstallFlags = darwinRuntimeFlags;
     };
   }
 )

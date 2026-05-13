@@ -7,6 +7,8 @@
 let
   supported-systems = with flake-utils.lib.system; [
     x86_64-linux
+    aarch64-darwin
+    x86_64-darwin
   ];
 in
 flake-utils.lib.eachSystem supported-systems (
@@ -30,6 +32,16 @@ flake-utils.lib.eachSystem supported-systems (
       rev = "6929bafac0b565692ed61e66032a79185ee9cf65";
       sha256 = "sha256-5rD1X1pf/1Tkfso37lFx0uRlpyXOfzGMMm3x1NYwyGo=";
     };
+
+    targetTriple = "x86_64-scei-ps4";
+    stubTargetTriple = "x86_64-pc-linux-gnu";
+    clang = "${pkgs.llvmPackages.clang-unwrapped}/bin/clang";
+    clangxx = "${pkgs.llvmPackages.clang-unwrapped}/bin/clang++";
+    llvmAr = "${pkgs.llvmPackages.llvm}/bin/llvm-ar";
+    llvmRanlib = "${pkgs.llvmPackages.llvm}/bin/llvm-ranlib";
+    targetIncludeFlags = "-I${musl}/include -I${toolchainIntermediate}/include";
+    targetRuntimeFlags = "-fPIC -DPS4 -D_LIBUNWIND_IS_BAREMETAL=1 -D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L ${targetIncludeFlags}";
+    targetRuntimeCxxFlags = "${targetRuntimeFlags} -fexceptions -frtti";
 
     toolchainIntermediate = pkgs.stdenv.mkDerivation {
       name = "toolchain-intermediate";
@@ -57,6 +69,10 @@ flake-utils.lib.eachSystem supported-systems (
         };
 
         buildInputs = [ pkgs.clang ];
+        makeFlags = [
+          "AR=${llvmAr}"
+          "RANLIB=${llvmRanlib}"
+        ];
 
         prePatch = ''
           patchShebangs --build configure
@@ -64,18 +80,20 @@ flake-utils.lib.eachSystem supported-systems (
         '';
 
         configurePhase = ''
+          export AR=${llvmAr}
+          export RANLIB=${llvmRanlib}
           mkdir build
           ./configure \
             --srcdir=. \
-            --target=x86_64-scei-ps4 \
-            --disable-shared CC="clang" \
+            --target=${targetTriple} \
+            --disable-shared CC="clang --target=${targetTriple}" \
             CFLAGS="-fPIC -DPS4 -D_LIBUNWIND_IS_BAREMETAL=1" \
             --prefix=./build
           echo $(pwd)
         '';
 
         installPhase = ''
-          make install
+          make AR=${llvmAr} RANLIB=${llvmRanlib} install
 
           mkdir -p $out
           mv build/{include,lib} $out
@@ -99,13 +117,23 @@ flake-utils.lib.eachSystem supported-systems (
         "installPhase"
       ];
 
-      buildInputs = [ pkgs.clang ];
+      buildInputs = [
+        pkgs.llvmPackages.clang-unwrapped
+        pkgs.lld
+      ];
 
       buildPhase = ''
         ${self.packages.${system}.orbis-lib-gen}/bin/generate.py system/common/lib
+        rm -f build/libc.c
+        for file in build/libSceLibcInternal.c build/libSceLibcInternal.h; do
+          grep -vE '__(atomic|sync)_' "$file" > "$file.filtered"
+          mv "$file.filtered" "$file"
+        done
         ${self.packages.${system}.orbis-lib-gen}/bin/gen_makefile.py
+        substituteInPlace build/Makefile \
+          --replace "gcc " "${pkgs.llvmPackages.clang-unwrapped}/bin/clang --target=${stubTargetTriple} -fuse-ld=lld "
         make -C build
-        rm build/out/libc.so
+        rm -f build/out/libc.so
       '';
 
       installPhase = ''
@@ -119,7 +147,7 @@ flake-utils.lib.eachSystem supported-systems (
       src = llvmProjectSrc;
 
       buildInputs = with pkgs; [
-        clang
+        llvmPackages.clang-unwrapped
         cmake
         (python3.withPackages (
           ps: with ps; [
@@ -138,12 +166,20 @@ flake-utils.lib.eachSystem supported-systems (
 
       buildPhase = ''
         mkdir compiler-rt/build && cd compiler-rt/build
-        cmake -DCMAKE_C_COMPILER="clang" \
-          -DCMAKE_CXX_COMPILER="clang++" \
-          -DCMAKE_C_FLAGS="-fPIC -DPS4 -D_LIBUNWIND_IS_BAREMETAL=1" \
-          -DCMAKE_CXX_FLAGS="-fPIC -DPS4 -D_LIBUNWIND_IS_BAREMETAL=1" \
+        cmake -DCMAKE_C_COMPILER="${clang}" \
+          -DCMAKE_CXX_COMPILER="${clangxx}" \
+          -DCMAKE_AR="${llvmAr}" \
+          -DCMAKE_C_COMPILER_TARGET="${targetTriple}" \
+          -DCMAKE_CXX_COMPILER_TARGET="${targetTriple}" \
+          -DCMAKE_SYSTEM_NAME=Linux \
+          -DCMAKE_SYSTEM_PROCESSOR=x86_64 \
+          -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY \
+          -DLLVM_COMPILER_CHECKED=ON \
+          -DCMAKE_C_FLAGS="${targetRuntimeFlags}" \
+          -DCMAKE_CXX_FLAGS="${targetRuntimeCxxFlags}" \
           -DLLVM_PATH="../../llvm" \
-          -DCOMPILER_RT_DEFAULT_TARGET_TRIPLE="x86_64-scei-ps4" \
+          -DCOMPILER_RT_DEFAULT_TARGET_ONLY=ON \
+          -DCOMPILER_RT_OS_DIR=linux \
           -DCOMPILER_RT_BAREMETAL_BUILD=YES \
           -DCOMPILER_RT_BUILD_BUILTINS=ON \
           -DCOMPILER_RT_BUILD_CRT=OFF \
@@ -157,9 +193,16 @@ flake-utils.lib.eachSystem supported-systems (
 
         mkdir libunwind/build && cd libunwind/build
         cmake \
-          -DCMAKE_C_COMPILER="clang" -DCMAKE_CXX_COMPILER="clang++" \
-          -DCMAKE_C_FLAGS="-fPIC -DPS4 -D_LIBUNWIND_IS_BAREMETAL=1" \
-          -DCMAKE_CXX_FLAGS="-fPIC -DPS4 -D_LIBUNWIND_IS_BAREMETAL=1" \
+          -DCMAKE_C_COMPILER="${clang}" -DCMAKE_CXX_COMPILER="${clangxx}" \
+          -DCMAKE_AR="${llvmAr}" \
+          -DCMAKE_C_COMPILER_TARGET="${targetTriple}" \
+          -DCMAKE_CXX_COMPILER_TARGET="${targetTriple}" \
+          -DCMAKE_SYSTEM_NAME=Linux \
+          -DCMAKE_SYSTEM_PROCESSOR=x86_64 \
+          -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY \
+          -DLLVM_COMPILER_CHECKED=ON \
+          -DCMAKE_C_FLAGS="${targetRuntimeFlags}" \
+          -DCMAKE_CXX_FLAGS="${targetRuntimeCxxFlags}" \
           -DLLVM_PATH="../../llvm" -DLIBUNWIND_USE_COMPILER_RT=YES \
           -DLIBUNWIND_BUILD_32_BITS=NO \
           -DLIBUNWIND_ENABLE_STATIC=ON \
@@ -171,10 +214,17 @@ flake-utils.lib.eachSystem supported-systems (
 
         mkdir libcxxabi/build && cd libcxxabi/build
         cmake \
-          -DCMAKE_C_COMPILER="clang" \
-          -DCMAKE_CXX_COMPILER="clang++" \
-          -DCMAKE_C_FLAGS="-fPIC -DPS4 -D_LIBUNWIND_IS_BAREMETAL=1 -I${musl}/include -I${toolchainIntermediate}/include" \
-          -DCMAKE_CXX_FLAGS="-fPIC -DPS4 -D_LIBUNWIND_IS_BAREMETAL=1 -I${musl}/include -I${toolchainIntermediate}/include" \
+          -DCMAKE_C_COMPILER="${clang}" \
+          -DCMAKE_CXX_COMPILER="${clangxx}" \
+          -DCMAKE_AR="${llvmAr}" \
+          -DCMAKE_C_COMPILER_TARGET="${targetTriple}" \
+          -DCMAKE_CXX_COMPILER_TARGET="${targetTriple}" \
+          -DCMAKE_SYSTEM_NAME=Linux \
+          -DCMAKE_SYSTEM_PROCESSOR=x86_64 \
+          -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY \
+          -DLLVM_COMPILER_CHECKED=ON \
+          -DCMAKE_C_FLAGS="${targetRuntimeFlags}" \
+          -DCMAKE_CXX_FLAGS="${targetRuntimeCxxFlags}" \
           -DLLVM_PATH="../../llvm" \
           -DLIBCXXABI_ENABLE_SHARED=NO \
           -DLIBCXXABI_ENABLE_STATIC=YES \
@@ -191,8 +241,15 @@ flake-utils.lib.eachSystem supported-systems (
         mkdir out
         mkdir libcxx/build && cd libcxx/build
         cmake \
-          -DCMAKE_C_COMPILER=clang \
-          -DCMAKE_CXX_COMPILER=clang++ \
+          -DCMAKE_C_COMPILER="${clang}" \
+          -DCMAKE_CXX_COMPILER="${clangxx}" \
+          -DCMAKE_AR="${llvmAr}" \
+          -DCMAKE_C_COMPILER_TARGET="${targetTriple}" \
+          -DCMAKE_CXX_COMPILER_TARGET="${targetTriple}" \
+          -DCMAKE_SYSTEM_NAME=Linux \
+          -DCMAKE_SYSTEM_PROCESSOR=x86_64 \
+          -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY \
+          -DLLVM_COMPILER_CHECKED=ON \
           -DLIBCXX_HAS_MUSL_LIBC=1 \
           -DLIBCXX_HAS_GCC_S_LIB=0 \
           -DLIBCXX_ENABLE_THREADS=1 \
@@ -203,8 +260,8 @@ flake-utils.lib.eachSystem supported-systems (
           -DLIBCXX_ENABLE_STATIC_ABI_LIBRARY=ON \
           -DLIBCXX_ENABLE_SHARED=OFF \
           -DLLVM_PATH="../../llvm" \
-          -DCMAKE_C_FLAGS="-DPS4 -fPIC -I${musl}/include -I${toolchainIntermediate}/include" \
-          -DCMAKE_CXX_FLAGS="-DPS4 -fPIC -I${musl}/include -I${toolchainIntermediate}/include" \
+          -DCMAKE_C_FLAGS="${targetRuntimeFlags}" \
+          -DCMAKE_CXX_FLAGS="${targetRuntimeCxxFlags}" \
           -DCMAKE_INSTALL_PREFIX="../../out" \
           ..
         cmake -DCMAKE_SYSROOT="${toolchainIntermediate}" ..
@@ -229,7 +286,7 @@ flake-utils.lib.eachSystem supported-systems (
         echo "ADDLIB libc++.a"    >> mri.txt
         echo "SAVE"               >> mri.txt
         echo "END"                >> mri.txt
-        ar -M < mri.txt && rm mri.txt && rm libc++.a && mv libc++M.a libc++.a
+        ${llvmAr} -M < mri.txt && rm mri.txt && rm libc++.a && mv libc++M.a libc++.a
         cd ../..
 
         mkdir -p $out
@@ -248,7 +305,7 @@ flake-utils.lib.eachSystem supported-systems (
       ];
 
       buildInputs = [
-        pkgs.clang
+        pkgs.llvmPackages.clang-unwrapped
         pkgs.rsync
       ];
 
@@ -269,15 +326,17 @@ flake-utils.lib.eachSystem supported-systems (
         cp ${self.packages.${pkgs.system}.create-gp4}/bin/create-gp4 $out/bin/linux
         cp ${self.packages.${pkgs.system}.readoelf}/bin/readoelf $out/bin/linux
 
-        clang src/crt/crtlib.c -fPIC -c -o $out/lib/crtlib.o
-        echo "CREATE $out/lib/libcM.a"                        > mri.txt
-        echo "ADDLIB $out/lib/libc.a"                        >> mri.txt
-        echo "ADDLIB $out/lib/libclang_rt.builtins-x86_64.a" >> mri.txt
+        ${clang} --target=${targetTriple} ${targetRuntimeFlags} -c src/crt/crtlib.c -o $out/lib/crtlib.o
+        cd $out/lib
+        echo "CREATE libcM.a"                        > mri.txt
+        echo "ADDLIB libc.a"                        >> mri.txt
+        echo "ADDLIB libclang_rt.builtins-x86_64.a" >> mri.txt
         echo "SAVE"                                 >> mri.txt
         echo "END"                                  >> mri.txt
-        ar -M < mri.txt
-        rm $out/lib/libc.a
-        mv $out/lib/{libcM.a,libc.a}
+        ${llvmAr} -M < mri.txt
+        rm mri.txt libc.a
+        mv libcM.a libc.a
+        cd - >/dev/null
         mv link.x $out/
 
         mkdir -p $out/nix-support
