@@ -26,6 +26,11 @@ flake-utils.lib.eachSystem supported-systems (
         hash = "sha256-Q5kqrSCt6jXpHD6zXhGp6RJz5rCM4j2vw1kTXaJEL9Y=";
       };
 
+      postPatch = ''
+        substituteInPlace installer/include/installer.h \
+          --replace-fail 'int runinstaller();' 'int runinstaller() __attribute__((visibility("hidden")));'
+      '';
+
       nativeBuildInputs = with pkgs; [
         binutils
         clang_18
