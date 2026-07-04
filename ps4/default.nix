@@ -9,6 +9,7 @@ flake-utils.lib.meld inputs [
   ./toolchain.nix
   ./shell.nix
   ./payload-sdk.nix
+  ./ps4debug-ng.nix
   ./hen.nix
   ./pppwn_cpp.nix
   ./pppwn.nix
