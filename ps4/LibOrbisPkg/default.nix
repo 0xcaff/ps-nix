@@ -33,6 +33,10 @@ flake-utils.lib.eachSystem supported-systems (
         sha256 = "sha256-FaEcRrJtIvsq9bQ6g5Q4Vj6FeGW4EwPpd8KwMLJaLaw=";
       };
 
+      patches = [
+        ./read-only-mmap.patch
+      ];
+
       nugetDeps = ./deps.json;
       runtimeDeps = [ pkgs.openssl_1_1 ];
 
