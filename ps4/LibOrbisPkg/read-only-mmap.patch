@@ -1,0 +1,29 @@
+diff --git a/LibOrbisPkg/GP4/Gp4Creator.cs b/LibOrbisPkg/GP4/Gp4Creator.cs
+index 3defb3f..c3fb57f 100644
+--- a/LibOrbisPkg/GP4/Gp4Creator.cs
++++ b/LibOrbisPkg/GP4/Gp4Creator.cs
+@@ -198 +198 @@ namespace LibOrbisPkg.GP4
+-      using (var pkgFile = MemoryMappedFile.CreateFromFile(pkgFilename, FileMode.Open))
++      using (var pkgFile = MemoryMappedFile.CreateFromFile(pkgFilename, FileMode.Open, mapName: null, capacity: 0, access: MemoryMappedFileAccess.Read))
+diff --git a/PkgTool/Program.cs b/PkgTool/Program.cs
+index 3f3c0a0..a939acc 100644
+--- a/PkgTool/Program.cs
++++ b/PkgTool/Program.cs
+@@ -22,0 +23,5 @@ namespace PkgTool
++    private static MemoryMappedFile OpenReadOnlyMemoryMappedFile(string path)
++    {
++      return MemoryMappedFile.CreateFromFile(path, FileMode.Open, mapName: null, capacity: 0, access: MemoryMappedFileAccess.Read);
++    }
++
+@@ -92 +97 @@ namespace PkgTool
+-          var mmf = MemoryMappedFile.CreateFromFile(pkgPath);
++          var mmf = OpenReadOnlyMemoryMappedFile(pkgPath);
+@@ -114 +119 @@ namespace PkgTool
+-          using(var mmf = MemoryMappedFile.CreateFromFile(pfsPath))
++          using(var mmf = OpenReadOnlyMemoryMappedFile(pfsPath))
+@@ -132 +137 @@ namespace PkgTool
+-          var mmf = MemoryMappedFile.CreateFromFile(pkgPath);
++          var mmf = OpenReadOnlyMemoryMappedFile(pkgPath);
+@@ -211 +216 @@ namespace PkgTool
+-              using (var pkgMM = MemoryMappedFile.CreateFromFile(pkgPath, FileMode.Open))
++              using (var pkgMM = OpenReadOnlyMemoryMappedFile(pkgPath))
