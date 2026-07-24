@@ -21,6 +21,20 @@ flake-utils.lib.eachSystem supported-systems (
       sha256 = "sha256-GnPFXWc1hBYLJ1JVZTA83H4ghGF8BG0rSGcFBLfQZ6g=";
     };
 
+    cecieAssetsSrc = pkgs.fetchFromGitHub {
+      owner = "earthonion";
+      repo = "cecie.nim-garlicsaves";
+      rev = "08b027ed791676c42c59938b41ed556b91f52c9c";
+      sha256 = "sha256-fLm4qlxtyS02OyPWS57Wc4U3YAoJ+GMxI8Pnh1ObwHY=";
+    };
+
+    openOrbisSrc = pkgs.fetchFromGitHub {
+      owner = "OpenOrbis";
+      repo = "OpenOrbis-PS4-Toolchain";
+      rev = "6929bafac0b565692ed61e66032a79185ee9cf65";
+      sha256 = "sha256-5rD1X1pf/1Tkfso37lFx0uRlpyXOfzGMMm3x1NYwyGo=";
+    };
+
     libjbcSrc = pkgs.fetchFromGitHub {
       owner = "sleirsgoevy";
       repo = "ps4-libjbc";
@@ -92,10 +106,6 @@ flake-utils.lib.eachSystem supported-systems (
       '';
     };
 
-    officialPkg = pkgs.fetchurl {
-      url = "https://github.com/hzhreal/cecie.nim/releases/download/v3.01/IV0000-HTOS00001_00-SAVEDATA00000000.pkg";
-      sha256 = "sha256-S4sedduwjYE52c15LqrVylv4Zxwm3cNADnsXkh5ckbY=";
-    };
   in
   {
     packages.cecie = pkgs.stdenvNoCC.mkDerivation {
@@ -142,15 +152,9 @@ flake-utils.lib.eachSystem supported-systems (
         done
         ar rcs ps4-libjbc/libjbc.a ps4-libjbc/*.o
 
-        "$OO_PS4_TOOLCHAIN/bin/linux/PkgTool.Core" \
-          pkg_makegp4 \
-          ${officialPkg} \
-          official-package
         mkdir -p package/sce_module package/sce_sys
-        cp official-package/sce_module/libSceFios2.prx package/sce_module/
-        cp official-package/sce_module/libc.prx package/sce_module/
-        cp official-package/sce_sys/icon0.png package/sce_sys/
-        cp official-package/sce_sys/keystone package/sce_sys/
+        cp ${openOrbisSrc}/samples/piglet/sce_module/*.prx package/sce_module/
+        cp ${cecieAssetsSrc}/pkg/sce_sys/icon0.png package/sce_sys/
 
         export app_PKG_DIR="$PWD/package"
         export app_SERVICE_ID="IV0000-HTOS00001_00-SAVEDATA00000000"
