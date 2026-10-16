@@ -20,5 +20,6 @@
     flake-utils.lib.meld inputs [
       ./ps4
       ./ps2
+      ./ps5
     ];
 }
