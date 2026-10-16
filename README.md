@@ -12,6 +12,19 @@ nix develop github:0xcaff/ps-nix#ps2dev
 nix develop --impure github:0xcaff/ps-nix#ps4
 ```
 
+## PS5 PUP unpacker
+
+Build and run [ps5-pup-unpacker](https://github.com/zecoxao/ps5-pup-unpacker)
+from this checkout:
+
+```
+nix build .#ps5-pup-unpacker
+nix run .#ps5-pup-unpacker -- update.pup.dec output
+```
+
+The input PUP must already be decrypted. The installed executable is
+`pup_unpacker`; nested filesystem images are extracted without unpacking them.
+
 ## why nix
 
 these toolchains are both fragile and complex. building from source breaks with
