@@ -120,30 +120,15 @@ flake-utils.lib.eachSystem supported-systems (
         ${pkgs.cmake}/bin/cmake --build build-runtimes --parallel "$NIX_BUILD_CORES"
         ${pkgs.cmake}/bin/cmake --install build-runtimes
 
-        mkdir -p "$out/nix-support"
-        echo "export PS5_PAYLOAD_SDK=$out" > "$out/nix-support/setup-hook"
         runHook postInstall
       '';
 
       # These ELF files target the PS5, not the build host.
       dontStrip = true;
       dontPatchELF = true;
-
-      meta = {
-        description = "SDK for PS5 payloads with C and C++ toolchains";
-        homepage = "https://github.com/ps5-payload-dev/sdk";
-        license = pkgs.lib.licenses.gpl3Plus;
-        platforms = supported-systems;
-      };
     };
   in
   {
     packages.ps5-payload-sdk = sdk;
-    devShells.ps5 = pkgs.mkShellNoCC {
-      packages = [
-        sdk
-        pkgs.gnumake
-      ];
-    };
   }
 )
