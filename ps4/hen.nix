@@ -18,7 +18,7 @@ flake-utils.lib.eachSystem supported-systems (
   {
     packages.ps4-libjbc =
       let
-        version = "d3fb28fce137c5ca0453428ed5c5476bf4cf4d14";
+        version = "ced297b9d1e6bee900c45d0b5a31d0669329e16d";
       in
 
       pkgs.stdenvNoCC.mkDerivation {
@@ -29,7 +29,7 @@ flake-utils.lib.eachSystem supported-systems (
           owner = "illusion0001";
           repo = "ps4-libjbc";
           rev = version;
-          sha256 = "sha256-AtWs+mki+1UK+pYEDBtvIpis8nzfLIXcY1x0QZto/HA=";
+          sha256 = "sha256-OKPnh1VaIzq8lKeRaU8XiKtydhJEOTI2C978HEHSv/8=";
         };
 
         buildInputs = [
@@ -50,7 +50,7 @@ flake-utils.lib.eachSystem supported-systems (
 
     packages.ps4-hen-plugins =
       let
-        version = "b46";
+        version = "build_88";
       in
       pkgs.stdenvNoCC.mkDerivation {
         pname = "ps4-hen-plugins";
@@ -72,10 +72,8 @@ flake-utils.lib.eachSystem supported-systems (
           owner = "Scene-Collective";
           repo = "ps4-hen-plugins";
           rev = version;
-          sha256 = "sha256-YD4QFKYlZtBn/AGWhQWBA8vm+JCIjxPJZYaCZhbggR0=";
+          sha256 = "sha256-gN2HuUtdAFMg1d34NO1Hc+IDxjqAtPU53QO9bnsw2KQ=";
         };
-
-        patches = [ ./plugins.patch ];
 
         postPatch = ''
           substituteInPlace build.sh --replace-fail '/bin/bash' '${pkgs.bash}/bin/bash'
@@ -87,7 +85,7 @@ flake-utils.lib.eachSystem supported-systems (
             --replace-fail '$(shell git rev-list HEAD --count)' '0'
           substituteInPlace **/Makefile \
             --replace-fail "\$(shell date '+%b %d %Y @ %T')" 'Jul 05 2025 @ 12:27:30'
-          substituteInPlace plugin_server/Makefile \
+          substituteInPlace plugin_{bootloader,server,shellcore}/Makefile \
             --replace-fail 'make -C ../extern/libjbc install' ' '
           substituteInPlace plugin_server/source/lib.c \
             --replace-fail '../../extern/libjbc/libjbc.h' ${localPkgs.ps4-libjbc}/include/libjbc.h
@@ -97,7 +95,6 @@ flake-utils.lib.eachSystem supported-systems (
         '';
 
         buildPhase = ''
-          bash int3.sh 4096 > common/cave.inc.c
           ./build.sh
         '';
 
@@ -111,7 +108,7 @@ flake-utils.lib.eachSystem supported-systems (
 
     packages.ps4-hen =
       let
-        version = "pre-release-main-119";
+        version = "pre-release-main-182";
       in
       pkgs.stdenvNoCC.mkDerivation {
         pname = "ps4-hen";
@@ -133,14 +130,10 @@ flake-utils.lib.eachSystem supported-systems (
           owner = "Scene-Collective";
           repo = "ps4-hen";
           rev = version;
-          sha256 = "sha256-Vxbsxuw+oqaw0E+E8vsleiqzO1OeBh683pJpukjJwhE=";
+          sha256 = "sha256-vFF6VWLOs+oaBJ4Lf7J78ObnxTs22Vs9UzEgCUzV0lM=";
         };
 
-        patches = [
-          ./hen.patch
-          ./hen-tls.patch
-          ./hen-ini.patch
-        ];
+        patches = [ ./hen.patch ];
 
         postPatch = ''
           substituteInPlace build.sh \

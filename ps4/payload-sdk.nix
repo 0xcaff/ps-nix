@@ -13,7 +13,7 @@ flake-utils.lib.eachSystem supported-systems (
   system:
   let
     pkgs = import nixpkgs { inherit system; };
-    version = "99113ef9ae38bdc76fa8e741dd70d9423417b0a1";
+    version = "b7326416c23ce14639e9180a24093bdc5eedb579";
     localPkgs = self.packages.${pkgs.system};
   in
   {
@@ -25,7 +25,7 @@ flake-utils.lib.eachSystem supported-systems (
         owner = "Scene-Collective";
         repo = "ps4-payload-sdk";
         rev = version;
-        sha256 = "sha256-y3vU3kOQomZ5ejXkZ6TzqLn/WdxD6eIJwXproCW3kH0=";
+        sha256 = "sha256-FuhqxET3VXQTLlAVrPuzbXJpjZSxwi7VaplCsMHl2/w=";
       };
 
       buildInputs = [
