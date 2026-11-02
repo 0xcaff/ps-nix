@@ -133,10 +133,7 @@ flake-utils.lib.eachSystem supported-systems (
           sha256 = "sha256-vFF6VWLOs+oaBJ4Lf7J78ObnxTs22Vs9UzEgCUzV0lM=";
         };
 
-        patches = [
-          ./hen.patch
-          ./hen-tls.patch
-        ];
+        patches = [ ./hen.patch ];
 
         postPatch = ''
           substituteInPlace build.sh \
