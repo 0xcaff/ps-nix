@@ -108,7 +108,7 @@ flake-utils.lib.eachSystem supported-systems (
 
     packages.ps4-hen =
       let
-        version = "pre-release-main-182";
+        version = "pre-release-main-184";
       in
       pkgs.stdenvNoCC.mkDerivation {
         pname = "ps4-hen";
@@ -130,7 +130,7 @@ flake-utils.lib.eachSystem supported-systems (
           owner = "Scene-Collective";
           repo = "ps4-hen";
           rev = version;
-          sha256 = "sha256-vFF6VWLOs+oaBJ4Lf7J78ObnxTs22Vs9UzEgCUzV0lM=";
+          sha256 = "sha256-0TxpcpEDdJtKwzRqL5AqB0QCNzGBxBaD9Jzpciz38QI=";
         };
 
         patches = [ ./hen.patch ];
